@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { sanitizeClientInput, findAll, findOne, add, update, remove} from "./client.controler.js";
 
-export const clientRouter = Router()
+export const clientRouter: Router = Router()
 
 clientRouter.get('/', findAll)
 clientRouter.get('/:id', findOne)

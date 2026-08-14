@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { Client } from "./clients.entity.js"
+import { orm } from '../shared/db/orm.js'
 
+const em = orm.em
 
 function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //funcion que actua como middleware
     req.body.sanitizedInput = {

@@ -3,6 +3,7 @@ import express from "express";
 import { clientRouter } from "./client/client.routers.js";
 import { orm, syncSchema } from './shared/db/orm.js';
 import { RequestContext } from '@mikro-orm/core';
+import { sportRouter } from "./sport/sport.routes.js";
 
 const app = express();
 app.use(express.json()) //Middleware
@@ -13,7 +14,7 @@ app.use((req, res, next) => {
 })
 // y antes de las rutas y meddlewares de negocio
 
-
+app.use('/api/sports', sportRouter)
 app.use('/api/clients', clientRouter) //Usa clientRouter para manejar las peticiones que llegan a esa ruta (get, put, patch, etc.)
 
 

@@ -1,3 +1,5 @@
+import { orm } from '../shared/db/orm.js';
+const em = orm.em;
 function sanitizeClientInput(req, res, next) {
     req.body.sanitizedInput = {
         "id": req.body.id,
