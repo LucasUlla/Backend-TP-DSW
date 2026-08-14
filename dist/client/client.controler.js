@@ -1,3 +1,4 @@
+import { Client } from "./clients.entity.js";
 import { orm } from '../shared/db/orm.js';
 const em = orm.em;
 function sanitizeClientInput(req, res, next) {
@@ -10,7 +11,8 @@ function sanitizeClientInput(req, res, next) {
         "type_doc": req.body.type_doc,
         "password": req.body.password,
         "birth_date": req.body.birth_date ? new Date(req.body.birth_date) : undefined, //Si no viene en el body no da undefined
-        "type_user": req.body.type_user
+        "type_user": req.body.type_user,
+        "sports": req.body.sports
     };
     //Uso solo las keys(propiedades) no nulas (para el patch)
     Object.keys(req.body.sanitizedInput).forEach((key) => {
@@ -27,32 +29,28 @@ function sanitizeClientInput(req, res, next) {
             errores.push("El formato del email es inválido.");
         }
     }
-    // Validar Enums (tipo_documento y tipo_usuario)
-    if (input.tipo_documento !== undefined) {
-        const validDocs = ['DNI', 'Pasaporte', 'CUIT', 'CUIL'];
-        if (!validDocs.includes(input.tipo_documento)) {
-            errores.push(`tipo_documento debe ser uno de: ${validDocs.join(', ')}.`);
+    // Validar Enums (type_doc y type_user)
+    if (input.type_doc !== undefined) {
+        const validDocs = ['DNI', 'Pasaporte']; // ojo: coincidí esto con tu tipo TipoDocumento real
+        if (!validDocs.includes(input.type_doc)) {
+            errores.push(`type_doc debe ser uno de: ${validDocs.join(', ')}.`);
         }
     }
-    if (input.tipo_usuario !== undefined) {
-        const validUsers = ['Admin', 'Cliente', 'Invitado'];
-        if (!validUsers.includes(input.tipo_usuario)) {
-            errores.push(`tipo_usuario debe ser uno de: ${validUsers.join(', ')}.`);
+    if (input.type_user !== undefined) {
+        const validUsers = ['Admin', 'Socio']; // ídem, coincidí con TipoUsuario real
+        if (!validUsers.includes(input.type_user)) {
+            errores.push(`type_user debe ser uno de: ${validUsers.join(', ')}.`);
         }
     }
-    // Validar que la fecha de nacimiento sea una fecha válida
-    if (input.fecha_nacimiento !== undefined) {
-        const parsedDate = Date.parse(input.fecha_nacimiento);
+    // Validar birth_date
+    if (input.birth_date !== undefined) {
+        const parsedDate = Date.parse(req.body.birth_date); // ojo: acá ya convertiste a Date arriba
         if (isNaN(parsedDate)) {
-            errores.push("fecha_nacimiento debe ser una fecha válida (ej: YYYY-MM-DD).");
-        }
-        else {
-            // Opcional: Convertir el string a un objeto Date real para que el controlador lo use
-            input.fecha_nacimiento = new Date(input.fecha_nacimiento);
+            errores.push("birth_date debe ser una fecha válida (ej: YYYY-MM-DD).");
         }
     }
-    // Validar que los textos no vengan vacíos
-    const stringFields = ['name', 'surname', 'documento', 'contrasena'];
+    // Validar textos no vacíos
+    const stringFields = ['name', 'surname', 'doc', 'password'];
     stringFields.forEach(field => {
         if (input[field] !== undefined) {
             if (typeof input[field] !== 'string' || input[field].trim() === '') {
@@ -71,26 +69,62 @@ function sanitizeClientInput(req, res, next) {
     next();
 }
 async function findAll(_, res) {
-    return res.status(500).send({ message: "Not Implemented" }); //devuelvo un ARRAY de clientes
+    try {
+        const clients = await em.find(Client, {}, { populate: ['sports'] });
+        res.status(200).send({ message: "Found Clients", data: clients });
+    }
+    catch (error) {
+        res.status(500).send({ message: error.message });
+    }
 }
 ;
 async function findOne(req, res) {
-    return res.status(500).send({ message: "Not Implemented" });
+    try {
+        const id = Number(req.params.id); //sanitized
+        const client = await em.findOneOrFail(Client, { id }, { populate: ['sports'] });
+        res.status(200).send({ message: "Found Client", data: client });
+    }
+    catch (error) {
+        res.status(500).send({ message: error.message });
+    }
 }
 ;
 async function add(req, res) {
-    //req.body (puede venir por partes) -> se usa un middleware 
-    return res.status(500).send({ message: "Not Implemented" });
+    try {
+        const client = em.create(Client, req.body.sanitizedInput);
+        await em.flush();
+        res.status(201).send({ message: "Client Created", data: client });
+    }
+    catch (error) {
+        res.status(500).send({ message: error.message });
+    }
 }
 ;
-//uso la misma funcion para put & patch
 async function update(req, res) {
-    return res.status(500).send({ message: "Not Implemented" });
+    try {
+        const id = Number(req.params.id);
+        const clientToUpdate = await em.findOneOrFail(Client, { id });
+        em.assign(clientToUpdate, req.body.sanitizedInput);
+        await em.flush();
+        res.status(200).json({ message: 'Client Updated', data: clientToUpdate });
+    }
+    catch (error) {
+        res.status(500).send({ message: error.message });
+    }
 }
 ;
 //Es delete pero ese nombre no deja ponerlo
 async function remove(req, res) {
-    return res.status(500).send({ message: "Not Implemented" });
+    try {
+        const id = Number(req.params.id);
+        const client = em.getReference(Client, id);
+        em.remove(client);
+        await em.flush();
+        res.status(201).send({ message: "Client Deleted" });
+    }
+    catch (error) {
+        res.status(500).send({ message: error.message });
+    }
 }
 export { sanitizeClientInput, findAll, findOne, add, update, remove };
 //# sourceMappingURL=client.controler.js.map

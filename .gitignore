@@ -1,3 +1,27 @@
-temp/
+# Dependencias
+node_modules/
+
+# Build / compilación
 dist/
 tsconfig.tsbuildinfo
+
+# Cache de MikroORM (TsMorphMetadataProvider)
+temp/
+
+# Variables de entorno (si en algún momento sacás credenciales del código)
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Editor / SO
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# Docker (si usás volúmenes locales o overrides)
+docker-compose.override.yml
