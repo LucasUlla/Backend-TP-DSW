@@ -3,9 +3,7 @@ import {findAll, findOne, add} from "./price.controler.js";
 
 export const priceRouter:Router = Router()
 
-// Modificamos las rutas GET para que exijan el parámetro idSport
-priceRouter.get('/sport/:sportId', findAll);
-priceRouter.get('/sport/:sportId/:id', findOne);
-priceRouter.post('', add)
-/*priceRouter.put('/:id', update)
-priceRouter.delete('/:id',remove)*/
+
+priceRouter.get('/', findAll);// soporta ?sportId= opcional
+priceRouter.get('/:id', findOne); //En nuestra BD pusimos que cada precio tenga ID
+priceRouter.post('', add);

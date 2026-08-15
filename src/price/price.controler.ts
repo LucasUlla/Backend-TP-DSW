@@ -8,9 +8,10 @@ const em = orm.em
 //Devuelve NaN
 async function findAll(req: Request, res: Response) {
     try{
-        const sportId = Number(req.params.sportId)
+        const sportId = Number(req.query.sportId)
         console.log('findAll')
-        const prices = await em.find(Price, { sport: sportId }) //Mikro-orm entiende al pasarle un número a esa propiedad, estás buscando por el ID de la clave foránea
+        const where = sportId ? { sport: Number(sportId) } : {}
+        const prices = await em.find(Price, where, { populate: ['sport'] }) //Mikro-orm entiende al pasarle un número a esa propiedad, estás buscando por el ID de la clave foránea
         res.status(200).json({message: 'find all prices', data: prices})
         } catch (error: any){
             res.status(500).send({message: error.message})
@@ -20,11 +21,10 @@ async function findAll(req: Request, res: Response) {
 //Devuelve NaN
 async function findOne(req: Request, res: Response){ //
    try{
-        const sportId = Number(req.params.sportId)
         const id = Number(req.params.id)
         console.log('findOne')
-        const price = await em.findOneOrFail(Price, {id: id, sport: sportId }) //Mikro-orm entiende al pasarle un número a esa propiedad, estás buscando por el ID de la clave foránea
-        res.status(200).json({message: 'find all price', data: price})
+        const price = await em.findOneOrFail(Price, {id: id}, { populate: ['sport'] }) //Mikro-orm entiende al pasarle un número a esa propiedad, estás buscando por el ID de la clave foránea
+        res.status(200).json({message: 'found price', data: price})
         } catch (error: any){
             res.status(500).send({message: error.message})
         }

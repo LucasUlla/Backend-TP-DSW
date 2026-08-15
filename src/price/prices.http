@@ -1,8 +1,22 @@
+### Crear un Sport para poder asociarle precios
+# @name createSportForPrice
+POST http://localhost:3000/api/sports
+Content-Type: application/json
 
-@sportId = 1
+{
+    "name": "Basquet"
+}
 
-### Get All
-GET http://localhost:3000/api/prices/sport/{{sportId}}
+### ID del sport creado
+@sportId = {{createSportForPrice.response.body.data.id}}
+
+
+### Get All (sin filtro, trae precios de todos los deportes)
+GET http://localhost:3000/api/prices
+
+
+### Get All (filtrado por sport)
+GET http://localhost:3000/api/prices?sportId={{sportId}}
 
 
 ###POST
@@ -11,12 +25,27 @@ POST http://localhost:3000/api/prices
 Content-Type: application/json
 
 {
-    "value": 5000,
+    "value": 10000,
     "sport": {{sportId}}
 }
 
-### ID
+### ID del price creado
 @id = {{createPrice.response.body.data.id}}
 
+
 ###Get One
-GET http://localhost:3000/api/prices/sport/1/1
+GET http://localhost:3000/api/prices/{{id}}
+
+
+### POST otro precio para el mismo sport (simula un cambio de precio)
+# @name createSecondPrice
+POST http://localhost:3000/api/prices
+Content-Type: application/json
+
+{
+    "value": 11000,
+    "sport": {{sportId}}
+}
+
+### Get All filtrado de nuevo — ahora debería traer los dos precios de este sport
+GET http://localhost:3000/api/prices?sportId={{sportId}}

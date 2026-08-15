@@ -1,0 +1,80 @@
+### Crear un Sport para poder asociarle cursos
+# @name createSportForCourse
+POST http://localhost:3000/api/sports
+Content-Type: application/json
+
+{
+    "name": "Natacion"
+}
+
+### ID del sport creado
+@sportId = {{createSportForCourse.response.body.data.id}}
+
+
+### Get All (sin filtro, trae cursos de todos los deportes)
+GET http://localhost:3000/api/courses
+
+
+### Get All (filtrado por sport)
+GET http://localhost:3000/api/courses?sportId={{sportId}}
+
+
+###POST
+# @name createCourse
+POST http://localhost:3000/api/courses
+Content-Type: application/json
+
+{
+    "course_no": 101,
+    "sched": "Lunes y Miercoles 18:00hs",
+    "professor": "Ana Gómez",
+    "start_date": "2026-03-01",
+    "finish_date": "2026-12-15",
+    "quota": 20,
+    "sport": {{sportId}}
+}
+
+### ID del course creado
+@id = {{createCourse.response.body.data.id}}
+
+
+###Get One
+GET http://localhost:3000/api/courses/{{id}}
+
+
+###PUT
+PUT http://localhost:3000/api/courses/{{id}}
+Content-Type: application/json
+
+{
+    "sched": "Martes y Jueves 19:00hs",
+    "professor": "Jorge Almiron",
+    "quota": 25
+}
+
+
+
+###Post course to delete
+# @name createCourseToDelete
+POST http://localhost:3000/api/courses
+Content-Type: application/json
+
+{
+    "course_no": 102,
+    "sched": "Viernes 17:00hs",
+    "professor": "Juan Pérez",
+    "start_date": "2026-03-01",
+    "finish_date": "2026-12-15",
+    "quota": 15,
+    "sport": {{sportId}}
+}
+
+### ID a borrar
+@idToDelete = {{createCourseToDelete.response.body.data.id}}
+
+###Delete
+DELETE http://localhost:3000/api/courses/{{idToDelete}}
+
+
+### Get All filtrado de nuevo — debería traer el curso actualizado, sin el borrado
+GET http://localhost:3000/api/courses?sportId={{sportId}}

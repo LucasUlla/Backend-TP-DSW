@@ -2,7 +2,7 @@
 GET http://localhost:3000/api/clients
 
 ### Obtener un cliente
-GET http://localhost:3000/api/clients/1
+GET http://localhost:3000/api/clients/2
 
 ### Obtener un cliente (con error)
 GET http://localhost:3000/api/clients/1234

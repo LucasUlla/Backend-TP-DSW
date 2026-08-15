@@ -1,10 +1,11 @@
 //import 'reflect-metadata'
 import express from "express";
-import { clientRouter } from "./client/client.routers.js";
+import { clientRouter } from "./client/client.routes.js";
 import { orm, syncSchema } from './shared/db/orm.js';
 import { RequestContext } from '@mikro-orm/core';
 import { sportRouter } from "./sport/sport.routes.js";
 import { priceRouter } from "./price/price.routes.js";
+import { courseRouter } from "./course/course.routes.js";
 
 const app = express();
 app.use(express.json()) //Middleware
@@ -18,6 +19,7 @@ app.use((req, res, next) => {
 app.use('/api/sports', sportRouter)
 app.use('/api/clients', clientRouter)
 app.use('/api/prices', priceRouter)
+app.use('/api/courses', courseRouter)
 
 
 //Por si ingresa mal a la url (notar que no hay ninguna ruta)

@@ -36,6 +36,6 @@ export class Client extends BaseEntity{
     @Property({ nullable: false, type: 'string' })
     type_user!: TipoUsuario
 
-    @ManyToMany(() => Sport, (sport) => sport.clients)
-    sports = new Collection<Sport>(this)
+    /*@ManyToMany(() => Sport, (sport) => sport.clients)
+    sports = new Collection<Sport>(this)*/
 }

@@ -17,7 +17,7 @@ async function findAll(_: Request, res: Response) {
 async function findOne(req: Request, res: Response){ //
     try{
         const id = Number(req.params.id)
-        const sport = await em.findOneOrFail(Sport, {id}) //hay varias formas de hacer un findOne
+        const sport = await em.findOneOrFail(Sport, {id}) //{ populate: ['prices'] } si quiero mostrar los precios tambien
         res.status(200).send({message: "Found Sport", data: sport})
     } catch (error:any){
         res.status(500).send({message: error.message})
