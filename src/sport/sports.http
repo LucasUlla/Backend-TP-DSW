@@ -16,6 +16,9 @@ Content-Type: application/json
 ###Get One
 GET http://localhost:3000/api/sports/{{id}}
 
+###Get One
+GET http://localhost:3000/api/sports/1
+
 ###PUT
 PUT http://localhost:3000/api/sports/{{id}}
 Content-Type: application/json

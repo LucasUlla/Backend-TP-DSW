@@ -4,6 +4,7 @@ import { clientRouter } from "./client/client.routers.js";
 import { orm, syncSchema } from './shared/db/orm.js';
 import { RequestContext } from '@mikro-orm/core';
 import { sportRouter } from "./sport/sport.routes.js";
+import { priceRouter } from "./price/price.routes.js";
 const app = express();
 app.use(express.json()); //Middleware
 //luego de los middleware base
@@ -12,7 +13,8 @@ app.use((req, res, next) => {
 });
 // y antes de las rutas y meddlewares de negocio
 app.use('/api/sports', sportRouter);
-app.use('/api/clients', clientRouter); //Usa clientRouter para manejar las peticiones que llegan a esa ruta (get, put, patch, etc.)
+app.use('/api/clients', clientRouter);
+app.use('/api/prices', priceRouter);
 //Por si ingresa mal a la url (notar que no hay ninguna ruta)
 app.use((_, res) => {
     return res.status(404).send({ message: "Resource not found" });

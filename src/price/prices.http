@@ -1,0 +1,22 @@
+
+@sportId = 1
+
+### Get All
+GET http://localhost:3000/api/prices/sport/{{sportId}}
+
+
+###POST
+# @name createPrice
+POST http://localhost:3000/api/prices
+Content-Type: application/json
+
+{
+    "value": 5000,
+    "sport": {{sportId}}
+}
+
+### ID
+@id = {{createPrice.response.body.data.id}}
+
+###Get One
+GET http://localhost:3000/api/prices/sport/1/1
