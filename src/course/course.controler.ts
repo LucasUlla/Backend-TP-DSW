@@ -75,7 +75,7 @@ async function findAll(req: Request, res: Response) {
 async function findOne(req: Request, res: Response){
    try {
       const id = Number(req.params.id)
-      const course = await em.findOneOrFail(Course, {id}, { populate: ['sport'] })
+      const course = await em.findOneOrFail(Course, {id}, { populate: ['sport', 'inscriptions'] })
       res.status(200).json({ message: 'find course', data: course })
    } catch (error: any) {
       res.status(500).send({message: error.message})

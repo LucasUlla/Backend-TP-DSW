@@ -2,7 +2,7 @@ import { Entity, PrimaryKey, Property, ManyToOne, OneToMany} from '@mikro-orm/de
 import { Collection } from '@mikro-orm/core'
 import { BaseEntity } from '../shared/db/baseEntity.entity.js'
 import { Sport } from '../sport/sport.entity.js'
-//import { Inscripcion } from '../inscripcion/inscripcion.entity.js'
+import { Inscription } from '../inscription/inscription.entity.js'
 
 @Entity()
 export class Course extends BaseEntity {
@@ -30,6 +30,7 @@ export class Course extends BaseEntity {
     @ManyToOne(() => Sport, {nullable: false})
     sport!: Sport
 
-    /*@OneToMany(() => Inscripcion, (inscripcion) => inscripcion.dictado)
-    inscripciones = new Collection<Inscripcion>(this)*/
+    @OneToMany(() => Inscription, (inscription) => inscription.course)
+    inscriptions = new Collection<Inscription>(this)
+
 }

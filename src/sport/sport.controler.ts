@@ -17,7 +17,7 @@ async function findAll(_: Request, res: Response) {
 async function findOne(req: Request, res: Response){ //
     try{
         const id = Number(req.params.id)
-        const sport = await em.findOneOrFail(Sport, {id}) //{ populate: ['prices'] } si quiero mostrar los precios tambien
+        const sport = await em.findOneOrFail(Sport, {id}, { populate: ['prices', 'courses']}) 
         res.status(200).send({message: "Found Sport", data: sport})
     } catch (error:any){
         res.status(500).send({message: error.message})
@@ -37,7 +37,6 @@ async function add(req: Request, res: Response){ //El nuevo recurso viene en el 
 };
 
 
-//ACTUALIZAR POR LA RELACION *A* CON CLIENT ???
 async function update(req: Request, res: Response){
     try{
         const id = Number(req.params.id)

@@ -84,7 +84,7 @@ function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //f
 
 async function findAll(_: Request, res: Response) {
     try{
-        const clients = await em.find(Client, {}, /*{populate: ['sports']}*/)
+        const clients = await em.find(Client, {})
         res.status(200).send({message: "Found Clients", data: clients})
     } catch (error:any){
         res.status(500).send({message: error.message})
@@ -93,8 +93,8 @@ async function findAll(_: Request, res: Response) {
 
 async function findOne(req: Request, res: Response){
     try{
-        const id = Number(req.params.id) //sanitized
-        const client = await em.findOneOrFail(Client, {id}, /*{populate: ['sports']}*/)
+        const id = Number(req.params.id)
+        const client = await em.findOneOrFail(Client, {id}, {populate: ['inscriptions']}) //	populate: ['inscriptions', 'inscriptions.course', 'inscriptions.course.sport']
         res.status(200).send({message: "Found Client", data: client})
 
     } catch (error:any){
@@ -128,7 +128,6 @@ async function update(req: Request, res: Response){
 
 };
 
-//Es delete pero ese nombre no deja ponerlo
 async function remove(req: Request, res: Response){
     try{
         const id = Number(req.params.id)

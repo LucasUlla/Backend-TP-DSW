@@ -80,8 +80,8 @@ async function findAll(_, res) {
 ;
 async function findOne(req, res) {
     try {
-        const id = Number(req.params.id); //sanitized
-        const client = await em.findOneOrFail(Client, { id });
+        const id = Number(req.params.id);
+        const client = await em.findOneOrFail(Client, { id }, { populate: ['inscriptions'] }); //	populate: ['inscriptions', 'inscriptions.course', 'inscriptions.course.sport']
         res.status(200).send({ message: "Found Client", data: client });
     }
     catch (error) {
@@ -113,7 +113,6 @@ async function update(req, res) {
     }
 }
 ;
-//Es delete pero ese nombre no deja ponerlo
 async function remove(req, res) {
     try {
         const id = Number(req.params.id);
