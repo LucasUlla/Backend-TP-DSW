@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { getEm, orm } from '../shared/db/orm.js'
 import { Course } from './course.entity.js'
-import { RequestContext } from '@mikro-orm/core'
+import * as courseService from './course.services.js'
 
 
 function sanitizeCourseInput(req: Request, res: Response, next: NextFunction) {
@@ -62,11 +62,8 @@ function sanitizeCourseInput(req: Request, res: Response, next: NextFunction) {
 
 async function findAll(req: Request, res: Response) {
    try {
-      const em = getEm() 
-      const sportId = Number(req.query.sportId)
-      console.log('findAll')
-      const where = sportId ? { sport: Number(sportId) } : {}
-      const courses = await em.find(Course, where, { populate: ['sport'] })
+      const sportId = req.query.sportId ? Number(req.query.sportId) : undefined
+      const courses = await courseService.getAllCourses(sportId)
       res.status(200).json({ message: 'find all courses', data: courses })
    } catch (error: any) {
       res.status(500).send({message: error.message})
@@ -74,9 +71,8 @@ async function findAll(req: Request, res: Response) {
 
 async function findOne(req: Request, res: Response){ 
    try {
-      const em = getEm()
       const id = Number(req.params.id)
-      const course = await em.findOneOrFail(Course, {id}, { populate: ['sport', 'inscriptions'] })
+      const course = await courseService.getOneCourse(id)
       res.status(200).json({ message: 'find course', data: course })
    } catch (error: any) {
       res.status(500).send({message: error.message})
@@ -86,9 +82,7 @@ async function findOne(req: Request, res: Response){
 async function add(req: Request, res: Response){
     
    try {
-      const em = getEm()
-      const course = em.create(Course, req.body.sanitizedInput)
-      await em.flush()
+      const course = await courseService.addCourse(req.body.sanitizedInput)
       res.status(201).json({ message: 'course created', data: course })
    } catch (error: any) {
       res.status(500).send({message: error.message})
@@ -98,11 +92,8 @@ async function add(req: Request, res: Response){
 async function update(req: Request, res: Response){
    
    try {
-      const em = getEm()
       const id = Number(req.params.id)
-      const courseToUpdate = await em.findOneOrFail(Course, {id})
-      em.assign(courseToUpdate, req.body.sanitizedInput)
-      await em.flush()
+      const courseToUpdate = await courseService.updateCourse(id, req.body.sanitizedInput)
       res.status(200).json({ message: 'Course Updated', data: courseToUpdate})
     } catch (error: any) {
       res.status(500).send({ message: error.message })
@@ -111,11 +102,8 @@ async function update(req: Request, res: Response){
 
 async function remove(req: Request, res: Response){ 
    try {
-      const em = getEm() 
       const id = Number(req.params.id)
-      const course = em.getReference(Course, id)
-      em.remove(course)
-      await em.flush()
+      await courseService.removeCourse(id)
       res.status(200).json({ message: 'Course Deleted'})
    } catch (error: any) {
       res.status(500).send({message: error.message})
