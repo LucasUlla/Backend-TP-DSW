@@ -4,7 +4,7 @@ POST http://localhost:3000/api/sports
 Content-Type: application/json
 
 {
-    "name": "Basquet"
+    "name": "Handball"
 }
 
 ### ID del sport creado

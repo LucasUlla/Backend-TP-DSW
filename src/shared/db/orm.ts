@@ -1,6 +1,5 @@
-import 'reflect-metadata';
+import 'reflect-metadata';//?
 import { MikroORM } from "@mikro-orm/mysql";
-//import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 import { SqlHighlighter } from "@mikro-orm/sql-highlighter";
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
 import { RequestContext } from '@mikro-orm/core'
