@@ -13,6 +13,6 @@ export class Price extends BaseEntity {
     @Property({ onCreate: () => new Date() })
     modification_date: Date = new Date()
 
-    @ManyToOne(() => Sport, { nullable: false }) // FK obligatoria, NO primary
+    @ManyToOne(() => Sport, { nullable: false, deleteRule: 'cascade' }) // FK obligatoria, NO primary
     sport!: Sport
 }

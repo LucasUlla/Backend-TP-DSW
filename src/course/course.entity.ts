@@ -27,7 +27,7 @@ export class Course extends BaseEntity {
     @Property()
     quota!: number
 
-    @ManyToOne(() => Sport, {nullable: false})
+    @ManyToOne(() => Sport, {nullable: false, deleteRule: 'cascade'})
     sport!: Sport
 
     @OneToMany(() => Inscription, (inscription) => inscription.course)

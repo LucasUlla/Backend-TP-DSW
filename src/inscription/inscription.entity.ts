@@ -5,10 +5,10 @@ import { Client } from '../client/clients.entity.js'
 
 @Entity()
 export class Inscription extends BaseEntity {
-    @ManyToOne(() => Course, { primary: true })
+    @ManyToOne(() => Course, { primary: true, deleteRule: 'cascade' })
     course!: Course
 
-    @ManyToOne(() => Client, { primary: true })
+    @ManyToOne(() => Client, { primary: true, deleteRule: 'cascade' })
     client!: Client
 
     @Property({ onCreate: () => new Date() })
