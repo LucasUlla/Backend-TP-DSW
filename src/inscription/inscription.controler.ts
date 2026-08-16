@@ -35,6 +35,7 @@ async function findAll(req: Request, res: Response) {
         console.log('FindAll')
 
         const where: any = {}
+        //agrego propiedades para el filtro si hiciera falta
         if (courseId) where.course = Number(courseId)
         if (clientId) where.client = Number(clientId)
         

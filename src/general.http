@@ -1,0 +1,319 @@
+###Documento general para probar flujo de la app completo
+
+### =====================================================
+### 1. SPORTS
+### =====================================================
+
+### Crear Sport 1
+# @name createSport1
+POST http://localhost:3000/api/sports
+Content-Type: application/json
+
+{
+    "name": "Futbol"
+}
+
+### Crear Sport 2
+# @name createSport2
+POST http://localhost:3000/api/sports
+Content-Type: application/json
+
+{
+    "name": "Natacion"
+}
+
+@sportId1 = {{createSport1.response.body.data.id}}
+@sportId2 = {{createSport2.response.body.data.id}}
+
+### Get All sports
+GET http://localhost:3000/api/sports
+
+### Get One sport
+GET http://localhost:3000/api/sports/{{sportId1}}
+
+### Update sport
+PUT http://localhost:3000/api/sports/{{sportId1}}
+Content-Type: application/json
+
+{
+    "name": "Futbol 5"
+}
+
+
+### =====================================================
+### 2. PRICES (historial, sin update/remove)
+### =====================================================
+
+### Crear precio inicial para Sport 1
+# @name createPrice1
+POST http://localhost:3000/api/prices
+Content-Type: application/json
+
+{
+    "value": 5000,
+    "sport": {{sportId1}}
+}
+
+### Crear un segundo precio (simula un aumento)
+# @name createPrice2
+POST http://localhost:3000/api/prices
+Content-Type: application/json
+
+{
+    "value": 5500,
+    "sport": {{sportId1}}
+}
+
+@priceId = {{createPrice1.response.body.data.id}}
+
+### Get All prices (sin filtro)
+GET http://localhost:3000/api/prices
+
+### Get All prices filtrado por sport (debería traer los 2 precios de arriba)
+GET http://localhost:3000/api/prices?sportId={{sportId1}}
+
+### Get One price
+GET http://localhost:3000/api/prices/{{priceId}}
+
+
+### =====================================================
+### 3. COURSES (dictados de un deporte)
+### =====================================================
+
+### Crear Course para Sport 1
+# @name createCourse1
+POST http://localhost:3000/api/courses
+Content-Type: application/json
+
+{
+    "course_no": 101,
+    "sched": "Lunes y Miercoles 18:00hs",
+    "professor": "Ana Gomez",
+    "start_date": "2026-03-01",
+    "finish_date": "2026-12-15",
+    "quota": 20,
+    "sport": {{sportId1}}
+}
+
+### Crear Course para Sport 2
+# @name createCourse2
+POST http://localhost:3000/api/courses
+Content-Type: application/json
+
+{
+    "course_no": 201,
+    "sched": "Sabados 10:00hs",
+    "professor": "Diego Torres",
+    "start_date": "2026-03-01",
+    "finish_date": "2026-12-15",
+    "quota": 12,
+    "sport": {{sportId2}}
+}
+
+@courseId1 = {{createCourse1.response.body.data.id}}
+@courseId2 = {{createCourse2.response.body.data.id}}
+
+### Get All courses (sin filtro)
+GET http://localhost:3000/api/courses
+
+### Get All courses filtrado por sport
+GET http://localhost:3000/api/courses?sportId={{sportId1}}
+
+### Get One course
+GET http://localhost:3000/api/courses/{{courseId1}}
+
+### Update course (PATCH parcial)
+PATCH http://localhost:3000/api/courses/{{courseId1}}
+Content-Type: application/json
+
+{
+    "quota": 25
+}
+
+
+### =====================================================
+### 4. CLIENTS
+### =====================================================
+
+### Crear Client 1
+# @name createClient1
+POST http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "name": "Lionel",
+    "surname": "Messi",
+    "email": "leo@mail.com",
+    "doc": "doc-flujo-1",
+    "type_doc": "DNI",
+    "password": "*leo10*",
+    "birth_date": "1987-06-24",
+    "type_user": "Socio"
+}
+
+### Crear Client 2
+# @name createClient2
+POST http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "name": "Emiliano",
+    "surname": "Martinez",
+    "email": "dibu@mail.com",
+    "doc": "doc-flujo-2",
+    "type_doc": "DNI",
+    "password": "*dibu1*",
+    "birth_date": "1992-09-02",
+    "type_user": "Socio"
+}
+
+@clientId1 = {{createClient1.response.body.data.id}}
+@clientId2 = {{createClient2.response.body.data.id}}
+
+### Get All clients
+GET http://localhost:3000/api/clients
+
+### Get One client
+GET http://localhost:3000/api/clients/{{clientId1}}
+
+### Update client (PATCH parcial)
+PATCH http://localhost:3000/api/clients/{{clientId1}}
+Content-Type: application/json
+
+{
+    "email": "leomessi10@mail.com"
+}
+
+
+### =====================================================
+### 5. INSCRIPTIONS
+### =====================================================
+
+### Inscribir Client 1 al Course 1
+# @name createInscription1
+POST http://localhost:3000/api/inscriptions
+Content-Type: application/json
+
+{
+    "course": {{courseId1}},
+    "client": {{clientId1}}
+}
+
+### Inscribir Client 2 también al Course 1
+# @name createInscription2
+POST http://localhost:3000/api/inscriptions
+Content-Type: application/json
+
+{
+    "course": {{courseId1}},
+    "client": {{clientId2}}
+}
+
+### Inscribir Client 1 también al Course 2 (un mismo cliente, dos cursos distintos)
+# @name createInscription3
+POST http://localhost:3000/api/inscriptions
+Content-Type: application/json
+
+{
+    "course": {{courseId2}},
+    "client": {{clientId1}}
+}
+
+### Get All inscriptions (sin filtro)
+GET http://localhost:3000/api/inscriptions
+
+### ¿Quiénes están anotados al Course 1? (debería traer Client 1 y Client 2)
+GET http://localhost:3000/api/inscriptions?courseId={{courseId1}}
+
+### ¿A qué está anotado Client 1? (debería traer Course 1 y Course 2)
+GET http://localhost:3000/api/inscriptions?clientId={{clientId1}}
+
+### Get One inscription (clave compuesta)
+GET http://localhost:3000/api/inscriptions/{{courseId1}}/{{clientId1}}
+
+
+### =====================================================
+### 6. CASOS DE ERROR (validaciones)
+### =====================================================
+
+### Inscripción duplicada → debería dar 409
+POST http://localhost:3000/api/inscriptions
+Content-Type: application/json
+
+{
+    "course": {{courseId1}},
+    "client": {{clientId1}}
+}
+
+### Sport con nombre duplicado (unique) → debería dar 500 (o el código que manejes para unique constraint)
+POST http://localhost:3000/api/sports
+Content-Type: application/json
+
+{
+    "name": "Futbol 5"
+}
+
+### Client con email inválido → debería dar 400
+POST http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "name": "Test",
+    "surname": "Invalido",
+    "email": "esto-no-es-un-email",
+    "doc": "doc-error-1",
+    "type_doc": "DNI",
+    "password": "123",
+    "birth_date": "2000-01-01",
+    "type_user": "Socio"
+}
+
+### Buscar un sport que no existe → debería dar 404 (si lo manejás) o 500
+GET http://localhost:3000/api/sports/99999
+
+### Buscar una inscripción que no existe → debería dar 404
+GET http://localhost:3000/api/inscriptions/99999/99999
+
+
+### =====================================================
+### 7. LIMPIEZA (borrar lo creado, en orden inverso por las FK)
+### =====================================================
+
+### Borrar inscripciones
+DELETE http://localhost:3000/api/inscriptions/{{courseId1}}/{{clientId1}}
+DELETE http://localhost:3000/api/inscriptions/{{courseId1}}/{{clientId2}}
+DELETE http://localhost:3000/api/inscriptions/{{courseId2}}/{{clientId1}}
+
+### Borrar course de prueba (armamos uno descartable)
+# @name createCourseToDelete
+POST http://localhost:3000/api/courses
+Content-Type: application/json
+
+{
+    "nro_curso": 999,
+    "horario": "A borrar",
+    "nombre_profesor": "N/A",
+    "fecha_ini": "2026-01-01",
+    "fecha_fin": "2026-01-02",
+    "cupo": 1,
+    "sport": {{sportId1}}
+}
+
+@courseIdToDelete = {{createCourseToDelete.response.body.data.id}}
+DELETE http://localhost:3000/api/courses/{{courseIdToDelete}}
+
+### Borrar clients de prueba
+DELETE http://localhost:3000/api/clients/{{clientId1}}
+DELETE http://localhost:3000/api/clients/{{clientId2}}
+
+### Borrar sport de prueba (armamos uno descartable, ya que Sport 1 y 2 tienen prices/courses relacionados)
+# @name createSportToDelete
+POST http://localhost:3000/api/sports
+Content-Type: application/json
+
+{
+    "name": "Deporte a borrar"
+}
+
+@sportIdToDelete = {{createSportToDelete.response.body.data.id}}
+DELETE http://localhost:3000/api/sports/{{sportIdToDelete}}

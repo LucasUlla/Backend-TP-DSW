@@ -4,6 +4,7 @@ import { orm } from '../shared/db/orm.js'
 
 const em = orm.em
 
+//Sanitize: whitelist + validación + filtrado de undefined
 function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //funcion que actua como middleware
     req.body.sanitizedInput = {
         "id": req.body.id,
@@ -14,8 +15,7 @@ function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //f
         "type_doc": req.body.type_doc,
         "password": req.body.password,
         "birth_date": req.body.birth_date? new Date(req.body.birth_date): undefined, //Si no viene en el body no da undefined
-        "type_user": req.body.type_user,
-        "sports": req.body.sports }
+        "type_user": req.body.type_user}
 
     //Uso solo las keys(propiedades) no nulas (para el patch)
     Object.keys(req.body.sanitizedInput).forEach((key) => {

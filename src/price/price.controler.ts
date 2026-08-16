@@ -5,7 +5,38 @@ import { RequestContext } from '@mikro-orm/core'
 
 const em = orm.em
 
-//Devuelve NaN
+function sanitizePriceInput(req: Request, res: Response, next: NextFunction) {
+    req.body.sanitizedInput = {
+        "value": req.body.value,
+        "sport": req.body.sport,
+    }
+
+    Object.keys(req.body.sanitizedInput).forEach((key) => {
+        if (req.body.sanitizedInput[key] === undefined) {
+            delete req.body.sanitizedInput[key]
+        }
+    })
+
+    const input = req.body.sanitizedInput
+    const errores: string[] = []
+
+    if (input.value !== undefined) {
+        if (typeof input.value !== 'number' || input.value <= 0) {
+            errores.push("value debe ser un número mayor a 0.")
+        }
+    }
+
+    if (input.sport === undefined) {
+        errores.push("sport es obligatorio.")
+    }
+
+    if (errores.length > 0) {
+        return res.status(400).json({ mensaje: "Errores de validación", detalles: errores })
+    }
+
+    next()
+}
+
 async function findAll(req: Request, res: Response) {
     try{
         const sportId = Number(req.query.sportId)
@@ -18,8 +49,8 @@ async function findAll(req: Request, res: Response) {
         }
 };
 
-//Devuelve NaN
-async function findOne(req: Request, res: Response){ //
+
+async function findOne(req: Request, res: Response){
    try{
         const id = Number(req.params.id)
         console.log('findOne')
@@ -30,9 +61,9 @@ async function findOne(req: Request, res: Response){ //
         }
 };
 
-async function add(req: Request, res: Response){ //El nuevo recurso viene en el body de la peticion
-   try{//deberiamos sanitizar el body aca!!
-           const price = em.create(Price, req.body) //operacion sincronica
+async function add(req: Request, res: Response){
+   try{
+           const price = em.create(Price, req.body.sanitizedInput) //operacion sincronica
            await em.flush() //commit hacia la bd
            res.status(201).json({message: 'price created', data: price})
        } catch (error: any){
@@ -41,4 +72,4 @@ async function add(req: Request, res: Response){ //El nuevo recurso viene en el 
 };
 
 
-export {findAll, findOne, add}
+export {sanitizePriceInput, findAll, findOne, add}
