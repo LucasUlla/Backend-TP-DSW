@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
-import { orm } from '../shared/db/orm.js'
+import { getEm, orm } from '../shared/db/orm.js'
 import { Price } from './price.entity.js'
 import { RequestContext } from '@mikro-orm/core'
 
-const em = orm.em
+//const em = orm.em
 
 function sanitizePriceInput(req: Request, res: Response, next: NextFunction) {
     req.body.sanitizedInput = {
@@ -39,6 +39,7 @@ function sanitizePriceInput(req: Request, res: Response, next: NextFunction) {
 
 async function findAll(req: Request, res: Response) {
     try{
+        const em = getEm()
         const sportId = Number(req.query.sportId)
         console.log('findAll')
         const where = sportId ? { sport: Number(sportId) } : {}
@@ -52,6 +53,7 @@ async function findAll(req: Request, res: Response) {
 
 async function findOne(req: Request, res: Response){
    try{
+        const em = getEm()
         const id = Number(req.params.id)
         console.log('findOne')
         const price = await em.findOneOrFail(Price, {id: id}, { populate: ['sport'] }) //Mikro-orm entiende al pasarle un número a esa propiedad, estás buscando por el ID de la clave foránea
@@ -63,9 +65,10 @@ async function findOne(req: Request, res: Response){
 
 async function add(req: Request, res: Response){
    try{
-           const price = em.create(Price, req.body.sanitizedInput) //operacion sincronica
-           await em.flush() //commit hacia la bd
-           res.status(201).json({message: 'price created', data: price})
+        const em = getEm()
+        const price = em.create(Price, req.body.sanitizedInput) //operacion sincronica
+        await em.flush() //commit hacia la bd
+        res.status(201).json({message: 'price created', data: price})
        } catch (error: any){
            res.status(500).send({message: error.message})
        }

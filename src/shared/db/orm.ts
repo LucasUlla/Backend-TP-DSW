@@ -3,6 +3,7 @@ import { MikroORM } from "@mikro-orm/mysql";
 //import { ReflectMetadataProvider } from '@mikro-orm/decorators/legacy';
 import { SqlHighlighter } from "@mikro-orm/sql-highlighter";
 import { TsMorphMetadataProvider } from '@mikro-orm/reflection';
+import { RequestContext } from '@mikro-orm/core'
 
 export const orm = await MikroORM.init({
     metadataProvider: TsMorphMetadataProvider,
@@ -26,4 +27,12 @@ export const syncSchema = async () => {
   await generator.create()
   */
   await generator.update()
+}
+/////////////////////////////////////
+export function getEm() {
+    const em = RequestContext.getEntityManager()
+    if (!em) {
+        throw new Error('No hay EntityManager en el contexto de la request. ¿Falta el middleware de RequestContext?')
+    }
+    return em
 }

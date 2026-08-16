@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express'
-import { orm } from '../shared/db/orm.js'
+import { getEm, orm } from '../shared/db/orm.js'
 import { Sport } from './sport.entity.js'
 import { RequestContext } from '@mikro-orm/core'
 
-const em = orm.em
+//const em = orm.em
 
 function sanitizeSportInput(req: Request, res: Response, next: NextFunction) {
     req.body.sanitizedInput = {
@@ -34,6 +34,7 @@ function sanitizeSportInput(req: Request, res: Response, next: NextFunction) {
 
 async function findAll(_: Request, res: Response) {
     try{
+        const em = getEm()
         const sports = await em.find(Sport, {})
         res.status(200).json({message: 'find all sports', data: sports})
     } catch (error: any){
@@ -43,6 +44,7 @@ async function findAll(_: Request, res: Response) {
 
 async function findOne(req: Request, res: Response){
     try{
+        const em = getEm()
         const id = Number(req.params.id)
         const sport = await em.findOneOrFail(Sport, {id}, { populate: ['prices', 'courses']}) 
         res.status(200).send({message: "Found Sport", data: sport})
@@ -53,6 +55,7 @@ async function findOne(req: Request, res: Response){
 
 async function add(req: Request, res: Response){
     try{
+        const em = getEm()
         const sport = em.create(Sport, req.body.sanitizedInput)
         await em.flush() //commit hacia la bd
         res.status(201).json({message: 'sport created', data: sport})
@@ -66,6 +69,7 @@ async function add(req: Request, res: Response){
 
 async function update(req: Request, res: Response){
     try{
+        const em = getEm()
         const id = Number(req.params.id)
         const sport = em.getReference(Sport, id) //No busca en la BD, me da una referencia (solo se puede hacer si el objeto no tiene una coleccion dentro a actualizar)
         em.assign(sport, req.body.sanitizedInput)
@@ -80,6 +84,7 @@ async function update(req: Request, res: Response){
 
 async function remove(req: Request, res: Response){
     try{
+        const em = getEm()
         const id = Number(req.params.id)
         const sport = em.getReference(Sport, id)
         em.remove(sport)

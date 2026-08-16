@@ -1,9 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
-import { orm } from '../shared/db/orm.js'
+import { getEm, orm } from '../shared/db/orm.js'
 import { Course } from './course.entity.js'
 import { RequestContext } from '@mikro-orm/core'
 
-const em = orm.em
 
 function sanitizeCourseInput(req: Request, res: Response, next: NextFunction) {
     req.body.sanitizedInput = {
@@ -63,6 +62,7 @@ function sanitizeCourseInput(req: Request, res: Response, next: NextFunction) {
 
 async function findAll(req: Request, res: Response) {
    try {
+      const em = getEm() 
       const sportId = Number(req.query.sportId)
       console.log('findAll')
       const where = sportId ? { sport: Number(sportId) } : {}
@@ -72,8 +72,9 @@ async function findAll(req: Request, res: Response) {
       res.status(500).send({message: error.message})
    }}
 
-async function findOne(req: Request, res: Response){
+async function findOne(req: Request, res: Response){ 
    try {
+      const em = getEm()
       const id = Number(req.params.id)
       const course = await em.findOneOrFail(Course, {id}, { populate: ['sport', 'inscriptions'] })
       res.status(200).json({ message: 'find course', data: course })
@@ -83,7 +84,9 @@ async function findOne(req: Request, res: Response){
 };
 
 async function add(req: Request, res: Response){
+    
    try {
+      const em = getEm()
       const course = em.create(Course, req.body.sanitizedInput)
       await em.flush()
       res.status(201).json({ message: 'course created', data: course })
@@ -92,8 +95,10 @@ async function add(req: Request, res: Response){
    }
 };
 
-async function update(req: Request, res: Response){ 
+async function update(req: Request, res: Response){
+   
    try {
+      const em = getEm()
       const id = Number(req.params.id)
       const courseToUpdate = await em.findOneOrFail(Course, {id})
       em.assign(courseToUpdate, req.body.sanitizedInput)
@@ -106,6 +111,7 @@ async function update(req: Request, res: Response){
 
 async function remove(req: Request, res: Response){ 
    try {
+      const em = getEm() 
       const id = Number(req.params.id)
       const course = em.getReference(Course, id)
       em.remove(course)

@@ -10,7 +10,7 @@ POST http://localhost:3000/api/sports
 Content-Type: application/json
 
 {
-    "name": "Futbol"
+    "name": "Futbol Sala"
 }
 
 ### Crear Sport 2
@@ -19,10 +19,11 @@ POST http://localhost:3000/api/sports
 Content-Type: application/json
 
 {
-    "name": "Natacion"
+    "name": "Padel"
 }
 
-@sportId1 = {{createSport1.response.body.data.id}}
+###
+@sportId1 = 9
 @sportId2 = {{createSport2.response.body.data.id}}
 
 ### Get All sports
@@ -64,6 +65,7 @@ Content-Type: application/json
     "sport": {{sportId1}}
 }
 
+###
 @priceId = {{createPrice1.response.body.data.id}}
 
 ### Get All prices (sin filtro)
@@ -110,6 +112,7 @@ Content-Type: application/json
     "sport": {{sportId2}}
 }
 
+###
 @courseId1 = {{createCourse1.response.body.data.id}}
 @courseId2 = {{createCourse2.response.body.data.id}}
 
@@ -122,8 +125,8 @@ GET http://localhost:3000/api/courses?sportId={{sportId1}}
 ### Get One course
 GET http://localhost:3000/api/courses/{{courseId1}}
 
-### Update course (PATCH parcial)
-PATCH http://localhost:3000/api/courses/{{courseId1}}
+### Update course
+PUT  http://localhost:3000/api/courses/{{courseId1}}
 Content-Type: application/json
 
 {
@@ -141,12 +144,12 @@ POST http://localhost:3000/api/clients
 Content-Type: application/json
 
 {
-    "name": "Lionel",
-    "surname": "Messi",
-    "email": "leo@mail.com",
+    "name": "Diego",
+    "surname": "Maradona",
+    "email": "maradona@mail.com",
     "doc": "doc-flujo-1",
     "type_doc": "DNI",
-    "password": "*leo10*",
+    "password": "*diego10*",
     "birth_date": "1987-06-24",
     "type_user": "Socio"
 }
@@ -159,7 +162,7 @@ Content-Type: application/json
 {
     "name": "Emiliano",
     "surname": "Martinez",
-    "email": "dibu@mail.com",
+    "email": "dibumtz@mail.com",
     "doc": "doc-flujo-2",
     "type_doc": "DNI",
     "password": "*dibu1*",
@@ -167,6 +170,7 @@ Content-Type: application/json
     "type_user": "Socio"
 }
 
+###
 @clientId1 = {{createClient1.response.body.data.id}}
 @clientId2 = {{createClient2.response.body.data.id}}
 
@@ -176,12 +180,12 @@ GET http://localhost:3000/api/clients
 ### Get One client
 GET http://localhost:3000/api/clients/{{clientId1}}
 
-### Update client (PATCH parcial)
-PATCH http://localhost:3000/api/clients/{{clientId1}}
+### Update client
+PUT http://localhost:3000/api/clients/{{clientId1}}
 Content-Type: application/json
 
 {
-    "email": "leomessi10@mail.com"
+    "email": "dam10@mail.com"
 }
 
 
@@ -281,7 +285,9 @@ GET http://localhost:3000/api/inscriptions/99999/99999
 
 ### Borrar inscripciones
 DELETE http://localhost:3000/api/inscriptions/{{courseId1}}/{{clientId1}}
+###
 DELETE http://localhost:3000/api/inscriptions/{{courseId1}}/{{clientId2}}
+###
 DELETE http://localhost:3000/api/inscriptions/{{courseId2}}/{{clientId1}}
 
 ### Borrar course de prueba (armamos uno descartable)
@@ -290,20 +296,22 @@ POST http://localhost:3000/api/courses
 Content-Type: application/json
 
 {
-    "nro_curso": 999,
-    "horario": "A borrar",
-    "nombre_profesor": "N/A",
-    "fecha_ini": "2026-01-01",
-    "fecha_fin": "2026-01-02",
-    "cupo": 1,
+    "course_no": 999,
+    "sched": "A borrar",
+    "professor": "N/A",
+    "start_date": "2026-01-01",
+    "finish_date": "2026-01-02",
+    "quota": 1,
     "sport": {{sportId1}}
 }
 
+###
 @courseIdToDelete = {{createCourseToDelete.response.body.data.id}}
 DELETE http://localhost:3000/api/courses/{{courseIdToDelete}}
 
 ### Borrar clients de prueba
 DELETE http://localhost:3000/api/clients/{{clientId1}}
+###
 DELETE http://localhost:3000/api/clients/{{clientId2}}
 
 ### Borrar sport de prueba (armamos uno descartable, ya que Sport 1 y 2 tienen prices/courses relacionados)
@@ -315,5 +323,6 @@ Content-Type: application/json
     "name": "Deporte a borrar"
 }
 
+###
 @sportIdToDelete = {{createSportToDelete.response.body.data.id}}
 DELETE http://localhost:3000/api/sports/{{sportIdToDelete}}

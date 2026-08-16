@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { orm } from '../shared/db/orm.js'
+import { getEm, orm } from '../shared/db/orm.js'
 import { RequestContext } from '@mikro-orm/core'
 import { Inscription } from './inscription.entity.js'
 
@@ -30,6 +30,7 @@ function sanitizeInscriptionInput(req: Request, res: Response, next: NextFunctio
 
 async function findAll(req: Request, res: Response) {
     try {
+        const em = getEm()
         const courseId = Number(req.query.courseId)
         const clientId = Number(req.query.Id)
         console.log('FindAll')
@@ -49,6 +50,7 @@ async function findAll(req: Request, res: Response) {
 
 async function findOne(req: Request, res: Response) {
     try {
+        const em = getEm()
         const courseId = Number(req.params.courseId)
         const clientId = Number(req.params.clientId)
 
@@ -67,6 +69,7 @@ async function findOne(req: Request, res: Response) {
 
 async function add(req: Request, res: Response) {
     try {
+        const em = getEm()
         const inscription = em.create(Inscription, req.body.sanitizedInput)
         await em.flush()
         res.status(201).json({ message: 'Inscription created', data: inscription })
@@ -77,6 +80,7 @@ async function add(req: Request, res: Response) {
 
 async function remove(req: Request, res: Response) {
     try {
+        const em = getEm()
         const courseId = Number(req.params.courseId)
         const clientId = Number(req.params.clientId)
         

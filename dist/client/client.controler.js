@@ -1,6 +1,5 @@
 import { Client } from "./clients.entity.js";
-import { orm } from '../shared/db/orm.js';
-const em = orm.em;
+import { getEm } from '../shared/db/orm.js';
 //Sanitize: whitelist + validación + filtrado de undefined
 function sanitizeClientInput(req, res, next) {
     req.body.sanitizedInput = {
@@ -70,6 +69,7 @@ function sanitizeClientInput(req, res, next) {
 }
 async function findAll(_, res) {
     try {
+        const em = getEm();
         const clients = await em.find(Client, {});
         res.status(200).send({ message: "Found Clients", data: clients });
     }
@@ -80,6 +80,7 @@ async function findAll(_, res) {
 ;
 async function findOne(req, res) {
     try {
+        const em = getEm();
         const id = Number(req.params.id);
         const client = await em.findOneOrFail(Client, { id }, { populate: ['inscriptions'] }); //	populate: ['inscriptions', 'inscriptions.course', 'inscriptions.course.sport']
         res.status(200).send({ message: "Found Client", data: client });
@@ -91,6 +92,7 @@ async function findOne(req, res) {
 ;
 async function add(req, res) {
     try {
+        const em = getEm();
         const client = em.create(Client, req.body.sanitizedInput);
         await em.flush();
         res.status(201).send({ message: "Client Created", data: client });
@@ -102,6 +104,7 @@ async function add(req, res) {
 ;
 async function update(req, res) {
     try {
+        const em = getEm();
         const id = Number(req.params.id);
         const clientToUpdate = await em.findOneOrFail(Client, { id });
         em.assign(clientToUpdate, req.body.sanitizedInput);
@@ -115,6 +118,7 @@ async function update(req, res) {
 ;
 async function remove(req, res) {
     try {
+        const em = getEm();
         const id = Number(req.params.id);
         const client = em.getReference(Client, id);
         em.remove(client);

@@ -1,8 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { Client } from "./clients.entity.js"
-import { orm } from '../shared/db/orm.js'
+import { getEm, orm } from '../shared/db/orm.js'
 
-const em = orm.em
 
 //Sanitize: whitelist + validación + filtrado de undefined
 function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //funcion que actua como middleware
@@ -84,6 +83,7 @@ function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //f
 
 async function findAll(_: Request, res: Response) {
     try{
+        const em = getEm()
         const clients = await em.find(Client, {})
         res.status(200).send({message: "Found Clients", data: clients})
     } catch (error:any){
@@ -93,6 +93,7 @@ async function findAll(_: Request, res: Response) {
 
 async function findOne(req: Request, res: Response){
     try{
+        const em = getEm()
         const id = Number(req.params.id)
         const client = await em.findOneOrFail(Client, {id}, {populate: ['inscriptions']}) //	populate: ['inscriptions', 'inscriptions.course', 'inscriptions.course.sport']
         res.status(200).send({message: "Found Client", data: client})
@@ -104,6 +105,7 @@ async function findOne(req: Request, res: Response){
 
 async function add(req: Request, res: Response){
     try{
+        const em = getEm()
         const client = em.create(Client, req.body.sanitizedInput)
         await em.flush()
         res.status(201).send({message: "Client Created", data: client})
@@ -116,6 +118,7 @@ async function add(req: Request, res: Response){
 
 async function update(req: Request, res: Response){
     try {
+        const em = getEm()
         const id = Number(req.params.id)
         const clientToUpdate = await em.findOneOrFail(Client, {id})
         em.assign(clientToUpdate, req.body.sanitizedInput)
@@ -130,6 +133,7 @@ async function update(req: Request, res: Response){
 
 async function remove(req: Request, res: Response){
     try{
+        const em = getEm()
         const id = Number(req.params.id)
         const client = em.getReference(Client, id)
         em.remove(client)

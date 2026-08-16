@@ -11,6 +11,7 @@ const app = express();
 app.use(express.json()); //Middleware
 //luego de los middleware base
 app.use((req, res, next) => {
+    console.log('Se ejecuta el Context');
     RequestContext.create(orm.em, next); //em = entity manager
 });
 // y antes de las rutas y meddlewares de negocio
