@@ -1,9 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
-import { getEm, orm } from '../shared/db/orm.js'
-import { Sport } from './sport.entity.js'
-import { RequestContext } from '@mikro-orm/core'
+import * as sportService from './sport.services.js'
 
-//const em = orm.em
 
 function sanitizeSportInput(req: Request, res: Response, next: NextFunction) {
     req.body.sanitizedInput = {
@@ -34,9 +31,8 @@ function sanitizeSportInput(req: Request, res: Response, next: NextFunction) {
 
 async function findAll(_: Request, res: Response) {
     try{
-        const em = getEm()
-        const sports = await em.find(Sport, {})
-        res.status(200).json({message: 'find all sports', data: sports})
+        const sports = await sportService.getAllSports()
+        res.status(200).json({message: 'Find all Sports', data: sports})
     } catch (error: any){
         res.status(500).send({message: error.message})
     }
@@ -44,9 +40,8 @@ async function findAll(_: Request, res: Response) {
 
 async function findOne(req: Request, res: Response){
     try{
-        const em = getEm()
         const id = Number(req.params.id)
-        const sport = await em.findOneOrFail(Sport, {id}, { populate: ['prices', 'courses']}) 
+        const sport = await sportService.getOneSport(id)
         res.status(200).send({message: "Found Sport", data: sport})
     } catch (error:any){
         res.status(500).send({message: error.message})
@@ -55,26 +50,20 @@ async function findOne(req: Request, res: Response){
 
 async function add(req: Request, res: Response){
     try{
-        const em = getEm()
-        const sport = em.create(Sport, req.body.sanitizedInput)
-        await em.flush() //commit hacia la bd
-        res.status(201).json({message: 'sport created', data: sport})
+        const sport = await sportService.addSport(req.body.sanitizedInput)
+        res.status(201).json({message: 'Sport Created', data: sport})
     } catch (error: any){
         res.status(500).send({message: error.message})
     }
 
-   
 };
 
 
 async function update(req: Request, res: Response){
     try{
-        const em = getEm()
         const id = Number(req.params.id)
-        const sport = em.getReference(Sport, id) //No busca en la BD, me da una referencia (solo se puede hacer si el objeto no tiene una coleccion dentro a actualizar)
-        em.assign(sport, req.body.sanitizedInput)
-        await em.flush()
-        res.status(200).json({message: 'Sport Updated'})
+        const sport = await sportService.updateSport(id, req.body.sanitizedInput)
+        res.status(200).json({message: 'Sport Updated', data: sport})
     } catch (error: any){
         res.status(500).send({message: error.message})
     }
@@ -84,11 +73,8 @@ async function update(req: Request, res: Response){
 
 async function remove(req: Request, res: Response){
     try{
-        const em = getEm()
         const id = Number(req.params.id)
-        const sport = em.getReference(Sport, id)
-        em.remove(sport)
-        await em.flush()
+        await sportService.removeSport(id)
         res.status(200).json({message: 'Sport Deleted'})
     } catch (error: any){
         res.status(500).send({message: error.message})

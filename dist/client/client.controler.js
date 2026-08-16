@@ -12,7 +12,7 @@ function sanitizeClientInput(req, res, next) {
         "birth_date": req.body.birth_date ? new Date(req.body.birth_date) : undefined, //Si no viene en el body no da undefined
         "type_user": req.body.type_user
     };
-    //Uso solo las keys(propiedades) no nulas (para el patch)
+    //Uso solo las keys(propiedades) no nulas
     Object.keys(req.body.sanitizedInput).forEach((key) => {
         if (req.body.sanitizedInput[key] === undefined) {
             delete req.body.sanitizedInput[key];
