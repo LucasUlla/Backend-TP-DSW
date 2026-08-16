@@ -9,7 +9,7 @@ export class Course extends BaseEntity {
     @PrimaryKey()
     id!: number
 
-    @Property()
+    @Property({unique: true})
     course_no!: number
 
     @Property()

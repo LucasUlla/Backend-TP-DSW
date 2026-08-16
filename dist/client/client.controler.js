@@ -1,5 +1,4 @@
-import { Client } from "./clients.entity.js";
-import { getEm } from '../shared/db/orm.js';
+import * as clientService from './client.services.js';
 //Sanitize: whitelist + validación + filtrado de undefined
 function sanitizeClientInput(req, res, next) {
     req.body.sanitizedInput = {
@@ -69,8 +68,7 @@ function sanitizeClientInput(req, res, next) {
 }
 async function findAll(_, res) {
     try {
-        const em = getEm();
-        const clients = await em.find(Client, {});
+        const clients = await clientService.getAllClients();
         res.status(200).send({ message: "Found Clients", data: clients });
     }
     catch (error) {
@@ -80,9 +78,8 @@ async function findAll(_, res) {
 ;
 async function findOne(req, res) {
     try {
-        const em = getEm();
         const id = Number(req.params.id);
-        const client = await em.findOneOrFail(Client, { id }, { populate: ['inscriptions'] }); //	populate: ['inscriptions', 'inscriptions.course', 'inscriptions.course.sport']
+        const client = await clientService.getOneClient(id);
         res.status(200).send({ message: "Found Client", data: client });
     }
     catch (error) {
@@ -92,9 +89,7 @@ async function findOne(req, res) {
 ;
 async function add(req, res) {
     try {
-        const em = getEm();
-        const client = em.create(Client, req.body.sanitizedInput);
-        await em.flush();
+        const client = await clientService.addClient(req.body.sanitizedInput);
         res.status(201).send({ message: "Client Created", data: client });
     }
     catch (error) {
@@ -104,11 +99,8 @@ async function add(req, res) {
 ;
 async function update(req, res) {
     try {
-        const em = getEm();
         const id = Number(req.params.id);
-        const clientToUpdate = await em.findOneOrFail(Client, { id });
-        em.assign(clientToUpdate, req.body.sanitizedInput);
-        await em.flush();
+        const clientToUpdate = await clientService.updateClient(id, req.body.sanitizedInput);
         res.status(200).json({ message: 'Client Updated', data: clientToUpdate });
     }
     catch (error) {
@@ -118,11 +110,8 @@ async function update(req, res) {
 ;
 async function remove(req, res) {
     try {
-        const em = getEm();
         const id = Number(req.params.id);
-        const client = em.getReference(Client, id);
-        em.remove(client);
-        await em.flush();
+        await clientService.removeClient(id);
         res.status(201).send({ message: "Client Deleted" });
     }
     catch (error) {

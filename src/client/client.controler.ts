@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { Client } from "./clients.entity.js"
 import { getEm, orm } from '../shared/db/orm.js'
+import * as clientService from './client.services.js'
 
 
 //Sanitize: whitelist + validación + filtrado de undefined
@@ -83,8 +84,7 @@ function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //f
 
 async function findAll(_: Request, res: Response) {
     try{
-        const em = getEm()
-        const clients = await em.find(Client, {})
+        const clients = await clientService.getAllClients()
         res.status(200).send({message: "Found Clients", data: clients})
     } catch (error:any){
         res.status(500).send({message: error.message})
@@ -93,9 +93,8 @@ async function findAll(_: Request, res: Response) {
 
 async function findOne(req: Request, res: Response){
     try{
-        const em = getEm()
         const id = Number(req.params.id)
-        const client = await em.findOneOrFail(Client, {id}, {populate: ['inscriptions']}) //	populate: ['inscriptions', 'inscriptions.course', 'inscriptions.course.sport']
+        const client = await clientService.getOneClient(id)
         res.status(200).send({message: "Found Client", data: client})
 
     } catch (error:any){
@@ -105,9 +104,7 @@ async function findOne(req: Request, res: Response){
 
 async function add(req: Request, res: Response){
     try{
-        const em = getEm()
-        const client = em.create(Client, req.body.sanitizedInput)
-        await em.flush()
+        const client = await clientService.addClient(req.body.sanitizedInput)
         res.status(201).send({message: "Client Created", data: client})
     } catch (error:any){
         res.status(500).send({message: error.message})
@@ -118,13 +115,9 @@ async function add(req: Request, res: Response){
 
 async function update(req: Request, res: Response){
     try {
-        const em = getEm()
         const id = Number(req.params.id)
-        const clientToUpdate = await em.findOneOrFail(Client, {id})
-        em.assign(clientToUpdate, req.body.sanitizedInput)
-        await em.flush()
+        const clientToUpdate = await clientService.updateClient(id, req.body.sanitizedInput)
         res.status(200).json({message: 'Client Updated', data: clientToUpdate})
-        
     } catch (error: any) {
         res.status(500).send({message: error.message})
     }
@@ -133,11 +126,8 @@ async function update(req: Request, res: Response){
 
 async function remove(req: Request, res: Response){
     try{
-        const em = getEm()
         const id = Number(req.params.id)
-        const client = em.getReference(Client, id)
-        em.remove(client)
-        await em.flush()
+        await clientService.removeClient(id)
         res.status(201).send({message: "Client Deleted"})
     } catch (error:any){
         res.status(500).send({message: error.message})
