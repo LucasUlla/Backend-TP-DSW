@@ -7,7 +7,7 @@ POST http://localhost:3000/api/sports
 Content-Type: application/json
 
 {
-    "name": "Futbol"
+    "name": "Boxeo"
 }
 
 ### ID
@@ -24,7 +24,7 @@ PUT http://localhost:3000/api/sports/{{id}}
 Content-Type: application/json
 
 {
-    "name": "Tenis"
+    "name": "Karate"
 }
 
 ###Post sport to delete
@@ -33,7 +33,7 @@ POST http://localhost:3000/api/sports
 Content-Type: application/json
 
 {
-    "name": "Golf"
+    "name": "Sport to Delete"
 }
 
 ###Delete
