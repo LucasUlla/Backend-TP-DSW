@@ -66,8 +66,10 @@ function sanitizeClientInput(req, res, next) {
     // 5. Si todo está perfecto, avanzamos al siguiente middleware o controlador
     next();
 }
-async function findAll(_, res) {
+async function findAll(req, res) {
     try {
+        const name = req.query.name ? String(req.query.name) : undefined;
+        const doc = req.query.doc ? String(req.query.doc) : undefined;
         const clients = await clientService.getAllClients();
         res.status(200).send({ message: "Found Clients", data: clients });
     }

@@ -9,12 +9,12 @@ import { Collection } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js";
 //import { Sport } from "../sport/sport.entity.js";
 import { Inscription } from "../inscription/inscription.entity.js";
+import { Fee } from "../fee/fee.entity.js";
 let Client = class Client extends BaseEntity {
     constructor() {
         super(...arguments);
         this.inscriptions = new Collection(this);
-        /*@ManyToMany(() => Sport, (sport) => sport.clients)
-        sports = new Collection<Sport>(this)*/
+        this.fees = new Collection(this);
     }
 };
 __decorate([
@@ -47,6 +47,9 @@ __decorate([
 __decorate([
     OneToMany(() => Inscription, (inscription) => inscription.client)
 ], Client.prototype, "inscriptions", void 0);
+__decorate([
+    OneToMany(() => Fee, (fee) => fee.client)
+], Client.prototype, "fees", void 0);
 Client = __decorate([
     Entity()
 ], Client);

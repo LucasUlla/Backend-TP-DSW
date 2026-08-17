@@ -82,8 +82,10 @@ function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //f
 }
 
 
-async function findAll(_: Request, res: Response) {
+async function findAll(req: Request, res: Response) {
     try{
+        const name = req.query.name ? String(req.query.name) : undefined
+        const doc = req.query.doc ? String(req.query.doc) : undefined
         const clients = await clientService.getAllClients()
         res.status(200).send({message: "Found Clients", data: clients})
     } catch (error:any){

@@ -2,9 +2,18 @@ import { EntityData, RequiredEntityData } from '@mikro-orm/core'
 import { getEm } from '../shared/db/orm.js'
 import { Client } from './clients.entity.js'
 
-export async function getAllClients() {
+export async function getAllClients(filters?: { name?: string, doc?: string }) { //contempla tabien busqueda por doc y nombre
     const em = getEm()
-    return await em.find(Client, {})
+    const where: any = {}
+
+    if (filters?.doc) {
+        where.doc = filters.doc
+    }
+
+    if (filters?.name) {
+        where.name = { $like: `%${filters.name}%` }
+    }
+    return await em.find(Client, where)
 }
 
 export async function getOneClient(id: number) {

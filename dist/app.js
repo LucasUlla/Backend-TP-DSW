@@ -7,6 +7,7 @@ import { sportRouter } from "./sport/sport.routes.js";
 import { priceRouter } from "./price/price.routes.js";
 import { courseRouter } from "./course/course.routes.js";
 import { inscriptionRouter } from "./inscription/inscription.routes.js";
+import { feeRouter } from "./fee/fee.routes.js";
 const app = express();
 app.use(express.json()); //Middleware
 //luego de los middleware base
@@ -20,6 +21,7 @@ app.use('/api/clients', clientRouter);
 app.use('/api/prices', priceRouter);
 app.use('/api/courses', courseRouter);
 app.use('/api/inscriptions', inscriptionRouter);
+app.use('/api/fees', feeRouter);
 //Por si ingresa mal a la url (notar que no hay ninguna ruta)
 app.use((_, res) => {
     return res.status(404).send({ message: "Resource not found" });
