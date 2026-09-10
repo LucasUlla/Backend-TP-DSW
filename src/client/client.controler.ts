@@ -139,14 +139,13 @@ async function remove(req: Request, res: Response){
 async function login(req: Request, res: Response) {
     try {
         const { email, password } = req.body
-        const client = await clientService.validateClientCredentials(email, password)
+        const result = await clientService.validateClientCredentials(email, password)
 
-        if (!client) {
+        if (!result) {
             return res.status(401).send({ message: "Email o contraseña incorrectos" })
         }
 
-        const { password: _, ...clientData } = client
-        res.status(200).send({ message: "Login exitoso", data: clientData })
+        res.status(200).send({ message: "Login exitoso", data: result })
     } catch (error: any) {
         res.status(500).send({ message: error.message })
     }

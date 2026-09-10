@@ -2,7 +2,10 @@ import { EntityData, RequiredEntityData } from '@mikro-orm/core'
 import { getEm } from '../shared/db/orm.js'
 import { Client } from './clients.entity.js'
 import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
 
+const JWT_SECRET = process.env.JWT_SECRET as string
+const JWT_EXPIRES_IN = '2h'
 const SALT_ROUNDS = 10
 
 export async function getAllClients(filters?: { name?: string, doc?: string }) { //contempla tabien busqueda por doc y nombre
@@ -57,10 +60,17 @@ export async function validateClientCredentials(email: string, plainPassword: st
     const em = getEm()
     const client = await em.findOne(Client, { email })
 
-    if (!client) {
-        return null // no reveles si fue "email no existe" vs "contraseña incorrecta" — mismo mensaje para ambos casos, por seguridad
-    }
+    if (!client) return null
 
     const isValid = await bcrypt.compare(plainPassword, client.password)
-    return isValid ? client : null
+    if (!isValid) return null
+
+    const token = jwt.sign(
+        { id: client.id, email: client.email, type_user: client.type_user },
+        JWT_SECRET,
+        { expiresIn: JWT_EXPIRES_IN }
+    )
+
+    const { password, ...clientData } = client
+    return { client: clientData, token }
 }
