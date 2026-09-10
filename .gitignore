@@ -25,3 +25,7 @@ Thumbs.db
 
 # Docker (si usás volúmenes locales o overrides)
 docker-compose.override.yml
+node_modules
+node_modules
+node_modules
+node_modules

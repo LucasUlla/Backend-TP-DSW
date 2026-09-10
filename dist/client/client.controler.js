@@ -120,5 +120,19 @@ async function remove(req, res) {
         res.status(500).send({ message: error.message });
     }
 }
-export { sanitizeClientInput, findAll, findOne, add, update, remove };
+async function login(req, res) {
+    try {
+        const { email, password } = req.body;
+        const client = await clientService.validateClientCredentials(email, password);
+        if (!client) {
+            return res.status(401).send({ message: "Email o contraseña incorrectos" });
+        }
+        const { password: _, ...clientData } = client;
+        res.status(200).send({ message: "Login exitoso", data: clientData });
+    }
+    catch (error) {
+        res.status(500).send({ message: error.message });
+    }
+}
+export { sanitizeClientInput, findAll, findOne, add, update, remove, login };
 //# sourceMappingURL=client.controler.js.map
