@@ -26,6 +26,13 @@ export function verifyToken(req: AuthRequest, res: Response, next: NextFunction)
     }
 }
 
+export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction) {
+    if (req.user?.type_user !== 'Admin') {
+        return res.status(403).send({ message: "Requiere permisos de administrador" })
+    }
+    next()
+} //Para recursos que requieran si o si ser admin
+
 export function requireOwnerOrAdmin(getResourceClientId: (req: AuthRequest) => number) {
     return (req: AuthRequest, res: Response, next: NextFunction) => {
         const resourceClientId = getResourceClientId(req)
@@ -37,4 +44,4 @@ export function requireOwnerOrAdmin(getResourceClientId: (req: AuthRequest) => n
         }
         next()
     }
-}
+} //Para recursos que requieran ser admin o el dueño del recurso

@@ -1,4 +1,4 @@
-//import 'reflect-metadata'
+import 'dotenv/config';
 import express from "express";
 import { clientRouter } from "./client/client.routes.js";
 import { orm, syncSchema } from './shared/db/orm.js';

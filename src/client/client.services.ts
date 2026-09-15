@@ -1,4 +1,4 @@
-import { EntityData, RequiredEntityData } from '@mikro-orm/core'
+import { EntityData, RequiredEntityData, wrap } from '@mikro-orm/core'
 import { getEm } from '../shared/db/orm.js'
 import { Client } from './clients.entity.js'
 import bcrypt from 'bcrypt'
@@ -56,6 +56,7 @@ export async function removeClient(id: number) {
     await em.flush()
 }
 
+
 export async function validateClientCredentials(email: string, plainPassword: string) {
     const em = getEm()
     const client = await em.findOne(Client, { email })
@@ -71,6 +72,6 @@ export async function validateClientCredentials(email: string, plainPassword: st
         { expiresIn: JWT_EXPIRES_IN }
     )
 
-    const { password, ...clientData } = client
+    const { password, ...clientData } = wrap(client).toObject() // ← wrap() en vez de .toObject() directo VERRR
     return { client: clientData, token }
 }
