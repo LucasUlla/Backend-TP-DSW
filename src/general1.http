@@ -1,0 +1,257 @@
+### =====================================================
+### 1. SETUP: Crear un Admin y un Socio
+### =====================================================
+
+### Crear cliente Admin
+# @name createAdmin
+POST http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "name": "Carlos",
+    "surname": "Director",
+    "email": "admin@club.com",
+    "doc": "doc-admin-1",
+    "type_doc": "DNI",
+    "password": "admin123",
+    "birth_date": "1980-01-01",
+    "type_user": "Admin"
+}
+
+### Crear cliente Socio
+# @name createSocio
+POST http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "name": "Lionel",
+    "surname": "Messi",
+    "email": "socio@club.com",
+    "doc": "doc-socio-1",
+    "type_doc": "DNI",
+    "password": "socio123",
+    "birth_date": "1987-06-24",
+    "type_user": "Socio"
+}
+
+###
+@socioId = {{createSocio.response.body.data.id}}
+
+
+### Login como Admin
+# @name loginAdmin
+POST http://localhost:3000/api/clients/login
+Content-Type: application/json
+
+{
+    "email": "admin@club.com",
+    "password": "admin123"
+}
+
+###
+@adminToken = {{loginAdmin.response.body.data.token}}
+
+
+### Login como Socio
+# @name loginSocio
+POST http://localhost:3000/api/clients/login
+Content-Type: application/json
+
+{
+    "email": "socio@club.com",
+    "password": "socio123"
+}
+
+###
+@socioToken = {{loginSocio.response.body.data.token}}
+
+
+### Login con contraseña incorrecta → debería dar 401
+POST http://localhost:3000/api/clients/login
+Content-Type: application/json
+
+{
+    "email": "socio@club.com",
+    "password": "contraseña-incorrecta"
+}
+
+
+### =====================================================
+### 2. SPORTS (lectura: cualquier logueado / escritura: solo Admin)
+### =====================================================
+
+### Get All sin token → debería dar 401
+GET http://localhost:3000/api/sports
+
+### Get All como Socio → debería funcionar (200)
+GET http://localhost:3000/api/sports
+Authorization: Bearer {{socioToken}}
+
+### Crear Sport como Socio → debería dar 403
+POST http://localhost:3000/api/sports
+Authorization: Bearer {{socioToken}}
+Content-Type: application/json
+
+{
+    "name": "Futbol"
+}
+
+### Crear Sport como Admin → debería dar 201
+# @name createSport
+POST http://localhost:3000/api/sports
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "name": "Futbol"
+}
+
+###
+@sportId = {{createSport.response.body.data.id}}
+
+### Get One como Socio → debería funcionar
+GET http://localhost:3000/api/sports/{{sportId}}
+Authorization: Bearer {{socioToken}}
+
+
+### =====================================================
+### 3. COURSES
+### =====================================================
+
+### Crear Course como Admin
+# @name createCourse
+POST http://localhost:3000/api/courses
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "course_no": 101,
+    "sched": "Lunes y Miercoles 18:00hs",
+    "professor": "Ana Gomez",
+    "start_date": "2026-03-01",
+    "finish_date": "2026-12-15",
+    "quota": 20,
+    "sport": {{sportId}}
+}
+
+###
+@courseId = {{createCourse.response.body.data.id}}
+
+### Get All courses como Socio (para elegir uno e inscribirse)
+GET http://localhost:3000/api/courses?sportId={{sportId}}
+Authorization: Bearer {{socioToken}}
+
+
+### =====================================================
+### 4. PRICES
+### =====================================================
+
+### Crear Price como Admin
+# @name createPrice
+POST http://localhost:3000/api/prices
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "value": 5000,
+    "sport": {{sportId}}
+}
+
+### Get All prices como Socio (para saber cuánto cuesta antes de anotarse)
+GET http://localhost:3000/api/prices?sportId={{sportId}}
+Authorization: Bearer {{socioToken}}
+
+
+### =====================================================
+### 5. CLIENTS (perfil propio vs todos)
+### =====================================================
+
+### Get All clients como Socio → debería dar 403 (solo Admin ve el listado completo)
+GET http://localhost:3000/api/clients
+Authorization: Bearer {{socioToken}}
+
+### Get All clients como Admin → debería funcionar
+GET http://localhost:3000/api/clients
+Authorization: Bearer {{adminToken}}
+
+### Get One — el Socio viendo SU PROPIO perfil → debería funcionar
+GET http://localhost:3000/api/clients/{{socioId}}
+Authorization: Bearer {{socioToken}}
+
+### Get One — el Socio intentando ver el perfil del Admin → debería dar 403
+GET http://localhost:3000/api/clients/1
+Authorization: Bearer {{socioToken}}
+
+### Update — el Socio editando su propio perfil → debería funcionar
+PATCH http://localhost:3000/api/clients/{{socioId}}
+Authorization: Bearer {{socioToken}}
+Content-Type: application/json
+
+{
+    "email": "leomessi10@mail.com"
+}
+
+
+### =====================================================
+### 6. INSCRIPTIONS
+### =====================================================
+
+### El Socio se inscribe a sí mismo → debería funcionar
+# @name createInscription
+POST http://localhost:3000/api/inscriptions
+Authorization: Bearer {{socioToken}}
+Content-Type: application/json
+
+{
+    "course": {{courseId}},
+    "client": {{socioId}}
+}
+
+### El Socio intenta inscribir a OTRO cliente (id 1, el Admin) → debería dar 403
+POST http://localhost:3000/api/inscriptions
+Authorization: Bearer {{socioToken}}
+Content-Type: application/json
+
+{
+    "course": {{courseId}},
+    "client": 1
+}
+
+### El Socio ve sus propias inscripciones → debería funcionar
+GET http://localhost:3000/api/inscriptions?clientId={{socioId}}
+Authorization: Bearer {{socioToken}}
+
+### Inscripción duplicada → debería dar 409
+POST http://localhost:3000/api/inscriptions
+Authorization: Bearer {{socioToken}}
+Content-Type: application/json
+
+{
+    "course": {{courseId}},
+    "client": {{socioId}}
+}
+
+
+### =====================================================
+### 7. FEES
+### =====================================================
+
+### Generar cuotas de todos los clientes (Admin) — período 2026-08
+POST http://localhost:3000/api/fees/generate?period=2026-08
+Authorization: Bearer {{adminToken}}
+
+### El Socio intenta generar cuotas → debería dar 403
+POST http://localhost:3000/api/fees/generate?period=2026-08
+Authorization: Bearer {{socioToken}}
+
+### El Socio ve sus propias cuotas → debería funcionar
+GET http://localhost:3000/api/fees?clientId={{socioId}}
+Authorization: Bearer {{socioToken}}
+
+### El Socio intenta ver TODAS las cuotas (sin filtro) → debería dar 403
+GET http://localhost:3000/api/fees
+Authorization: Bearer {{socioToken}}
+
+### El Admin ve todas las cuotas
+GET http://localhost:3000/api/fees
+Authorization: Bearer {{adminToken}}

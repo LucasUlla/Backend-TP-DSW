@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from "express";
+import cors from 'cors';
 import { clientRouter } from "./client/client.routes.js";
 import { orm, syncSchema } from './shared/db/orm.js';
 import { RequestContext } from '@mikro-orm/core';
@@ -11,6 +12,7 @@ import { feeRouter } from "./fee/fee.routes.js";
 
 const app = express();
 app.use(express.json()) //Middleware
+app.use(cors()) //Middleware
 
 //luego de los middleware base
 app.use((req, res, next) => {
