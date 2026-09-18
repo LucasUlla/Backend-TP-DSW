@@ -15,7 +15,7 @@ Content-Type: application/json
     "name": "Cristiano",
     "surname": "Ronaldo",
     "email": "cr7@mail.com",
-    "doc": "doc3",
+    "doc": "1234567",
     "password": "*ctr3*",
     "birth_date": "2026-07-03",
     "type_user": "Socio",

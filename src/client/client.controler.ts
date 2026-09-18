@@ -68,10 +68,7 @@ function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //f
 
     // 4. Si hay errores, cortamos la petición y devolvemos un 400 (Bad Request)
     if (errores.length > 0) {
-        return res.status(400).json({
-            mensaje: "Errores de validación",
-            detalles: errores
-        });
+        return res.status(400).json({ message: "Errores de validación", data: errores });
     }
 
     // 5. Si todo está perfecto, avanzamos al siguiente middleware o controlador

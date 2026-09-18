@@ -27,7 +27,7 @@ function sanitizePriceInput(req: Request, res: Response, next: NextFunction) {
     }
 
     if (errores.length > 0) {
-        return res.status(400).json({ mensaje: "Errores de validación", detalles: errores })
+        return res.status(400).json({ message: "Errores de validación", data: errores })
     }
 
     next()
