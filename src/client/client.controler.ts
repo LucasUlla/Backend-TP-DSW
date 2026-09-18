@@ -34,6 +34,13 @@ function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //f
         }
     }
 
+    if (input.doc !== undefined) {
+    const docRegex = /^\d{7,8}$/
+    if (!docRegex.test(String(input.doc))) {
+        errores.push("doc debe contener solo números, entre 7 y 8 dígitos.")
+    }
+    }
+
     if (input.type_user !== undefined) {
         const validUsers = ['Admin', 'Socio'];
         if (!validUsers.includes(input.type_user)) {
@@ -50,7 +57,7 @@ function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //f
     }
 
     // Validar textos no vacíos
-    const stringFields = ['name', 'surname', 'doc', 'password'];
+    const stringFields = ['name', 'surname', 'password'];
     stringFields.forEach(field => {
         if (input[field] !== undefined) {
             if (typeof input[field] !== 'string' || input[field].trim() === '') {
