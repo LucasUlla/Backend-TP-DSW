@@ -1,6 +1,6 @@
 import { EntityData, RequiredEntityData, wrap } from '@mikro-orm/core'
 import { getEm } from '../shared/db/orm.js'
-import { Client } from './clients.entity.js'
+import { Client } from './client.entity.js'
 import bcrypt from 'bcrypt'
 import jwt from 'jsonwebtoken'
 

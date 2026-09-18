@@ -1,6 +1,6 @@
 import {Entity, PrimaryKey, Property, ManyToMany, OneToMany} from '@mikro-orm/decorators/legacy'
 import { BaseEntity } from '../shared/db/baseEntity.entity.js'
-import { Client } from '../client/clients.entity.js'
+import { Client } from '../client/client.entity.js'
 import { Collection } from '@mikro-orm/core'
 import { Price } from '../price/price.entity.js'
 import { Course } from '../course/course.entity.js'

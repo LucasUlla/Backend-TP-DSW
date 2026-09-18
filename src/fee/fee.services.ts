@@ -1,6 +1,6 @@
 import { getEm } from '../shared/db/orm.js'
 import { Fee } from './fee.entity.js'
-import { Client } from '../client/clients.entity.js'
+import { Client } from '../client/client.entity.js'
 import { Inscription } from '../inscription/inscription.entity.js'
 import { Price } from '../price/price.entity.js'
 import { EntityData, RequiredEntityData } from '@mikro-orm/core'

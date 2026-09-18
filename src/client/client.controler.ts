@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { Client } from "./clients.entity.js"
+import { Client } from "./client.entity.js"
 import { getEm, orm } from '../shared/db/orm.js'
 import * as clientService from './client.services.js'
 
@@ -12,7 +12,6 @@ function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //f
         "surname": req.body.surname,
         "email": req.body.email,
         "doc": req.body.doc,
-        "type_doc": req.body.type_doc,
         "password": req.body.password,
         "birth_date": req.body.birth_date? new Date(req.body.birth_date): undefined, //Si no viene en el body no da undefined
         "type_user": req.body.type_user}
@@ -35,16 +34,8 @@ function sanitizeClientInput (req:Request, res:Response, next:NextFunction){ //f
         }
     }
 
-    // Validar Enums (type_doc y type_user)
-    if (input.type_doc !== undefined) {
-        const validDocs = ['DNI', 'Pasaporte'];  // ojo: coincidí esto con tu tipo TipoDocumento real
-        if (!validDocs.includes(input.type_doc)) {
-            errores.push(`type_doc debe ser uno de: ${validDocs.join(', ')}.`);
-        }
-    }
-
     if (input.type_user !== undefined) {
-        const validUsers = ['Admin', 'Socio'];  // ídem, coincidí con TipoUsuario real
+        const validUsers = ['Admin', 'Socio'];
         if (!validUsers.includes(input.type_user)) {
             errores.push(`type_user debe ser uno de: ${validUsers.join(', ')}.`);
         }

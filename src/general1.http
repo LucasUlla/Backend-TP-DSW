@@ -12,7 +12,6 @@ Content-Type: application/json
     "surname": "Director",
     "email": "admin@club.com",
     "doc": "doc-admin-1",
-    "type_doc": "DNI",
     "password": "admin123",
     "birth_date": "1980-01-01",
     "type_user": "Admin"
@@ -28,7 +27,6 @@ Content-Type: application/json
     "surname": "Messi",
     "email": "socio@club.com",
     "doc": "doc-socio-1",
-    "type_doc": "DNI",
     "password": "socio123",
     "birth_date": "1987-06-24",
     "type_user": "Socio"
