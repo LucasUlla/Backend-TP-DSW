@@ -1,0 +1,42 @@
+### Get All
+GET http://localhost:3000/api/sports
+
+###POST
+# @name createSport
+POST http://localhost:3000/api/sports
+Content-Type: application/json
+
+{
+    "name": "Fútbol"
+}
+
+### ID
+@id = {{createSport.response.body.data.id}}
+
+###Get One
+GET http://localhost:3000/api/sports/{{id}}
+
+###Get One
+GET http://localhost:3000/api/sports/1
+
+###PUT
+PUT http://localhost:3000/api/sports/{{id}}
+Content-Type: application/json
+
+{
+    "name": "Futbol"
+}
+
+###Post sport to delete
+# @name createSportToDelete
+POST http://localhost:3000/api/sports
+Content-Type: application/json
+
+{
+    "name": "Sport to Delete"
+}
+
+###Delete
+@idToDelete = {{createSportToDelete.response.body.data.id}}
+
+DELETE http://localhost:3000/api/sports/{{idToDelete}}
