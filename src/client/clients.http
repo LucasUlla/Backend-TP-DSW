@@ -1,3 +1,33 @@
+### Crear cliente Admin
+POST http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "name": "Carlos",
+    "surname": "Director",
+    "email": "admin@club.com",
+    "doc": "1111111",
+    "password": "admin123",
+    "birth_date": "1980-01-01",
+    "type_user": "Admin"
+}
+
+### Crear cliente Socio
+POST http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "name": "Lionel",
+    "surname": "Messi",
+    "email": "socio@club.com",
+    "doc": "2222222",
+    "password": "socio123",
+    "birth_date": "1987-06-24",
+    "type_user": "Socio"
+}
+
+
+
 ### Obtener todos los clientes
 GET http://localhost:3000/api/clients
 

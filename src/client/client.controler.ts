@@ -136,8 +136,11 @@ async function login(req: Request, res: Response) {
         const { email, password } = req.body
         const result = await clientService.validateClientCredentials(email, password)
 
-        if (!result) {
-            return res.status(401).send({ message: "Email o contraseña incorrectos" })
+        if ('error' in result) {
+            if (result.error === 'USER_NOT_FOUND') {
+                return res.status(404).send({ message: "El usuario no existe" })
+            }
+            return res.status(401).send({ message: "Los datos ingresados son incorrectos" })
         }
 
         res.status(200).send({ message: "Login exitoso", data: result })

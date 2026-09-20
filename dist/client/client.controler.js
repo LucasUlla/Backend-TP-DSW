@@ -56,10 +56,7 @@ function sanitizeClientInput(req, res, next) {
     });
     // 4. Si hay errores, cortamos la petición y devolvemos un 400 (Bad Request)
     if (errores.length > 0) {
-        return res.status(400).json({
-            message: "Errores de validación",
-            data: errores
-        });
+        return res.status(400).json({ message: "Errores de validación", data: errores });
     }
     // 5. Si todo está perfecto, avanzamos al siguiente middleware o controlador
     next();
@@ -122,8 +119,11 @@ async function login(req, res) {
     try {
         const { email, password } = req.body;
         const result = await clientService.validateClientCredentials(email, password);
-        if (!result) {
-            return res.status(401).send({ message: "Email o contraseña incorrectos" });
+        if ('error' in result) {
+            if (result.error === 'USER_NOT_FOUND') {
+                return res.status(404).send({ message: "El usuario no existe" });
+            }
+            return res.status(401).send({ message: "Los datos ingresados son incorrectos" });
         }
         res.status(200).send({ message: "Login exitoso", data: result });
     }

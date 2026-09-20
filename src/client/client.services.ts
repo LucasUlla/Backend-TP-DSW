@@ -61,10 +61,14 @@ export async function validateClientCredentials(email: string, plainPassword: st
     const em = getEm()
     const client = await em.findOne(Client, { email })
 
-    if (!client) return null
+    if (!client) {
+        return { error: 'USER_NOT_FOUND' as const }
+    }
 
     const isValid = await bcrypt.compare(plainPassword, client.password)
-    if (!isValid) return null
+    if (!isValid) {
+        return { error: 'INVALID_CREDENTIALS' as const }
+    }
 
     const token = jwt.sign(
         { id: client.id, email: client.email, type_user: client.type_user },
