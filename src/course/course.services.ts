@@ -2,10 +2,17 @@ import { getEm } from '../shared/db/orm.js'
 import { Course } from './course.entity.js'
 import { RequiredEntityData, EntityData } from '@mikro-orm/core'
 
-export async function getAllCourses(sportId?: number) {
+export async function getAllCourses(sportId?: number): Promise<any[]>{
     const em = getEm()
     const where = sportId ? { sport: sportId } : {}
-    return await em.find(Course, where, { populate: ['sport'] })
+    const courses = await em.find(Course, where, { populate: ['sport'] })
+    const data = await Promise.all(
+     courses.map(async (c) => {
+      const inscriptionsCount = await c.inscriptions.loadCount()
+      return { ...c, inscriptionsCount }
+    })
+  )
+  return data
 }
 
 export async function getOneCourse(id: number) {

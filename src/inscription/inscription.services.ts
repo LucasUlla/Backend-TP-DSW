@@ -33,25 +33,32 @@ export async function removeInscription(courseId: number, clientId: number) {
 
 
 // Errores y Validacion de la Inscripcion
+
+//creo los tipo de error
 export class ScheduleConflictError extends Error {}
 export class DuplicateInscriptionError extends Error {}
 
+//Compara si dos intervalos de tiempo se pisan
 function timeRangesOverlap(startA: string, endA: string, startB: string, endB: string): boolean {
     return startA < endB && startB < endA
 }
 
+//Compara si dos arrays de dias se pisan
 function daysOverlap(daysA: string[], daysB: string[]): boolean {
     return daysA.some(d => daysB.includes(d))
 }
 
+
 async function validateNoScheduleConflict(clientId: number, newCourse: Course) {
     const em = getEm()
+    // Obtengo todas las inscripciones del cliente
     const existingInscriptions = await em.find(
         Inscription,
         { client: clientId },
         { populate: ['course'] }
     )
 
+    //Itero sobre las inscripciones existentes y comparo los horarios y dias con el nuevo curso
     for (const insc of existingInscriptions) {
         const existingCourse = insc.course
         if (
