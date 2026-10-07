@@ -12,17 +12,23 @@ export class Course extends BaseEntity {
     @Property({unique: true})
     course_no!: number
 
-    @Property()
-    sched!: string
-
-    @Property()
-    professor!: string
+    @Property({ type: 'json' })
+    days!: string[]  // ej: ['Lunes', 'Miercoles']
 
     @Property()
     start_date!: Date
 
     @Property()
     finish_date!: Date
+
+    @Property({ type: 'time' })
+    start_time!: string  // 'HH:MM'
+
+    @Property({ type: 'time' })
+    end_time!: string
+
+    @Property()
+    professor!: string
 
     @Property()
     quota!: number

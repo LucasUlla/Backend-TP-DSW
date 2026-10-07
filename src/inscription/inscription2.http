@@ -1,0 +1,200 @@
+### =====================================================
+### SETUP: Login como Admin (asumiendo que ya existe)
+### =====================================================
+
+# @name loginAdmin
+POST http://localhost:3000/api/clients/login
+Content-Type: application/json
+
+{
+    "email": "admin@club.com",
+    "password": "admin123"
+}
+
+###
+@adminToken = {{loginAdmin.response.body.data.token}}
+
+
+### Crear un cliente Socio para las pruebas
+# @name createSocio
+POST http://localhost:3000/api/clients
+Content-Type: application/json
+
+{
+    "name": "Juan",
+    "surname": "Perez",
+    "email": "juan.horarios@mail.com",
+    "doc": "30123456",
+    "password": "socio123",
+    "birth_date": "1995-05-10",
+    "type_user": "Socio"
+}
+
+###
+@socioId = {{createSocio.response.body.data.id}}
+
+# @name loginSocio
+POST http://localhost:3000/api/clients/login
+Content-Type: application/json
+
+{
+    "email": "juan.horarios@mail.com",
+    "password": "socio123"
+}
+
+###
+@socioToken = {{loginSocio.response.body.data.token}}
+
+
+### =====================================================
+### Crear un Sport
+### =====================================================
+
+# @name createSport
+POST http://localhost:3000/api/sports
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "name": "Natacion"
+}
+###
+@sportId = {{createSport.response.body.data.id}}
+
+
+### =====================================================
+### Crear 3 Courses: dos que CHOCAN, uno que NO
+### =====================================================
+
+### Course A: Lunes y Miercoles 18:00-19:00
+# @name createCourseA
+POST http://localhost:3000/api/courses
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "course_no": 1,
+    "days": ["Lunes", "Miercoles"],
+    "start_time": "18:00",
+    "end_time": "19:00",
+    "professor": "Ana Gomez",
+    "start_date": "2026-03-01",
+    "finish_date": "2026-12-15",
+    "quota": 20,
+    "sport": {{sportId}}
+}
+###
+@courseIdA = {{createCourseA.response.body.data.id}}
+
+
+### Course B: Miercoles 18:30-19:30 → CHOCA con A (comparte miércoles, se superpone el horario)
+# @name createCourseB
+POST http://localhost:3000/api/courses
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "course_no": 2,
+    "days": ["Miercoles"],
+    "start_time": "18:30",
+    "end_time": "19:30",
+    "professor": "Diego Torres",
+    "start_date": "2026-03-01",
+    "finish_date": "2026-12-15",
+    "quota": 15,
+    "sport": {{sportId}}
+}
+###
+@courseIdB = {{createCourseB.response.body.data.id}}
+
+
+### Course C: Martes y Jueves 20:00-21:00 → NO choca (días distintos)
+# @name createCourseC
+POST http://localhost:3000/api/courses
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "course_no": 3,
+    "days": ["Martes", "Jueves"],
+    "start_time": "20:00",
+    "end_time": "21:00",
+    "professor": "Diego Torres",
+    "start_date": "2026-03-01",
+    "finish_date": "2026-12-15",
+    "quota": 15,
+    "sport": {{sportId}}
+}
+###
+@courseIdC = {{createCourseC.response.body.data.id}}
+
+
+### =====================================================
+### Pruebas de inscripción
+### =====================================================
+
+### 1. Inscribirse al Course A → debería dar 201 (sin conflicto, es la primera)
+# @name inscribeA
+POST http://localhost:3000/api/inscriptions
+Authorization: Bearer {{socioToken}}
+Content-Type: application/json
+
+{
+    "course": {{courseIdA}},
+    "client": {{socioId}}
+}
+
+### 2. Intentar inscribirse al Course B → debería dar 409 (choca con A: mismo día, horario superpuesto)
+POST http://localhost:3000/api/inscriptions
+Authorization: Bearer {{socioToken}}
+Content-Type: application/json
+
+{
+    "course": {{courseIdB}},
+    "client": {{socioId}}
+}
+
+### 3. Inscribirse al Course C → debería dar 201 (días distintos, sin conflicto)
+POST http://localhost:3000/api/inscriptions
+Authorization: Bearer {{socioToken}}
+Content-Type: application/json
+
+{
+    "course": {{courseIdC}},
+    "client": {{socioId}}
+}
+
+
+### =====================================================
+### Caso límite: horarios que "tocan" pero no se superponen
+### =====================================================
+
+### Course D: Lunes 19:00-20:00 → empieza justo cuando termina A (19:00), NO debería chocar
+# @name createCourseD
+POST http://localhost:3000/api/courses
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+    "course_no": 4,
+    "days": ["Lunes"],
+    "start_time": "19:00",
+    "end_time": "20:00",
+    "professor": "Ana Gomez",
+    "start_date": "2026-03-01",
+    "finish_date": "2026-12-15",
+    "quota": 10,
+    "sport": {{sportId}}
+}
+###
+@courseIdD = {{createCourseD.response.body.data.id}}
+
+### Inscribirse al Course D → debería dar 201 (horarios contiguos, no se solapan)
+POST http://localhost:3000/api/inscriptions
+Authorization: Bearer {{socioToken}}
+Content-Type: application/json
+
+{
+    "course": {{courseIdD}},
+    "client": {{socioId}}
+}

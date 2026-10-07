@@ -7,10 +7,12 @@ import * as courseService from './course.services.js'
 function sanitizeCourseInput(req: Request, res: Response, next: NextFunction) {
     req.body.sanitizedInput = {
         "course_no": req.body.course_no,
-        "sched": req.body.sched,
-        "professor": req.body.professor,
+        "days": req.body.days,
         "start_date": req.body.start_date ? new Date(req.body.start_date) : undefined,
         "finish_date": req.body.finish_date ? new Date(req.body.finish_date) : undefined,
+        "start_time": req.body.start_time,
+        "end_time": req.body.end_time,
+        "professor": req.body.professor,
         "quota": req.body.quota,
         "sport": req.body.sport, // id del Sport al que pertenece
     }
@@ -24,6 +26,8 @@ function sanitizeCourseInput(req: Request, res: Response, next: NextFunction) {
 
     const input = req.body.sanitizedInput
     const errores: string[] = []
+    const VALID_DAYS = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo']
+    const timeRegex = /^([01]\d|2[0-3]):([0-5]\d)$/
 
     if (input.quota !== undefined) {
         if (typeof input.quota !== 'number' || input.cupo <= 0) {
@@ -43,14 +47,29 @@ function sanitizeCourseInput(req: Request, res: Response, next: NextFunction) {
         errores.push("fecha_ini no puede ser posterior a fecha_fin.")
     }
 
-    const stringFields = ['sched', 'professor']
-    stringFields.forEach(field => {
-        if (input[field] !== undefined) {
-            if (typeof input[field] !== 'string' || input[field].trim() === '') {
-                errores.push(`El campo ${field} no puede estar vacío y debe ser texto.`)
+    if (input.professor !== undefined) {
+            if (typeof input.professor !== 'string' || input.professor.trim() === '') {
+                errores.push(`El campo professor no puede estar vacío y debe ser texto.`)
             }
         }
-    })
+
+    if (input.days !== undefined) {
+        if (!Array.isArray(input.days) || input.days.length === 0) {
+            errores.push("days debe ser un array con al menos un día.")
+        } else if (!input.days.every((d: string) => VALID_DAYS.includes(d))) {
+            errores.push(`days solo puede contener: ${VALID_DAYS.join(', ')}.`)
+        }
+    }
+
+    if (input.start_time !== undefined && !timeRegex.test(input.start_time)) {
+        errores.push("start_time debe tener formato HH:MM.")
+    }
+    if (input.end_time !== undefined && !timeRegex.test(input.end_time)) {
+        errores.push("end_time debe tener formato HH:MM.")
+    }
+    if (input.start_time && input.end_time && input.start_time >= input.end_time) {
+        errores.push("start_time debe ser anterior a end_time.")
+    }
 
     if (errores.length > 0) {
         return res.status(400).json({ message: "Errores de validación", data: errores })

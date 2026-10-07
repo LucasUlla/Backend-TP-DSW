@@ -1,6 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 import { getEm, orm } from '../shared/db/orm.js'
 import * as inscriptionService from './inscription.services.js'
+import { ScheduleConflictError, DuplicateInscriptionError} from './inscription.services.js'
+
 
 const em = orm.em
 
@@ -49,11 +51,27 @@ async function findOne(req: Request, res: Response) {
     }
 }
 
+/*async function add(req: Request, res: Response) {
+    try {
+        const inscription = await inscriptionService.addInscription(req.body.sanitizedInput)
+        res.status(201).json({ message: 'Inscription created', data: inscription })
+    } catch (error: any) {
+        res.status(500).send({ message: error.message })
+    }
+}*/
+
+
 async function add(req: Request, res: Response) {
     try {
         const inscription = await inscriptionService.addInscription(req.body.sanitizedInput)
         res.status(201).json({ message: 'Inscription created', data: inscription })
     } catch (error: any) {
+        if (error instanceof DuplicateInscriptionError) {
+            return res.status(409).send({ message: error.message })
+        }
+        if (error instanceof ScheduleConflictError) {
+            return res.status(409).send({ message: error.message })
+        }
         res.status(500).send({ message: error.message })
     }
 }
