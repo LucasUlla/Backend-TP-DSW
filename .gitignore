@@ -3,12 +3,12 @@ node_modules/
 
 # Build / compilación
 dist/
-tsconfig.tsbuildinfo
+*.tsbuildinfo
 
 # Cache de MikroORM (TsMorphMetadataProvider)
 temp/
 
-# Variables de entorno (si en algún momento sacás credenciales del código)
+# Variables de entorno
 .env
 .env.local
 
@@ -23,9 +23,5 @@ pnpm-debug.log*
 .DS_Store
 Thumbs.db
 
-# Docker (si usás volúmenes locales o overrides)
+# Docker
 docker-compose.override.yml
-node_modules
-node_modules
-node_modules
-node_modules
