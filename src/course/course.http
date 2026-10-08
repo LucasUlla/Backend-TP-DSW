@@ -10,9 +10,21 @@ Content-Type: application/json
 ### ID del sport creado
 @sportId = {{createSportForCourse.response.body.data.id}}
 
+# @name loginSocio
+POST http://localhost:3000/api/clients/login
+Content-Type: application/json
+
+{
+    "email": "juan.horarios@mail.com",
+    "password": "socio123"
+}
+###
+@socioToken = {{loginSocio.response.body.data.token}}
 
 ### Get All (sin filtro, trae cursos de todos los deportes)
 GET http://localhost:3000/api/courses
+Authorization: Bearer {{socioToken}}
+Content-Type: application/json
 
 
 ### Get All (filtrado por sport)

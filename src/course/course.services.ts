@@ -2,6 +2,12 @@ import { getEm } from '../shared/db/orm.js'
 import { Course } from './course.entity.js'
 import { RequiredEntityData, EntityData } from '@mikro-orm/core'
 
+interface CourseWithCount extends Course {
+  inscriptionCount: number
+}
+export class QuotaExceededError extends Error {}
+
+
 export async function getAllCourses(sportId?: number): Promise<any[]>{
     const em = getEm()
     const where = sportId ? { sport: sportId } : {}
@@ -15,9 +21,11 @@ export async function getAllCourses(sportId?: number): Promise<any[]>{
   return data
 }
 
-export async function getOneCourse(id: number) {
+export async function getOneCourse (id: number): Promise<CourseWithCount>{
     const em = getEm()
-    return await em.findOneOrFail(Course, { id }, { populate: ['sport', 'inscriptions'] })
+    const course = await em.findOneOrFail(Course, { id }, { populate: ['sport', 'inscriptions'] })
+    const inscriptionCount = await course.inscriptions.loadCount()
+    return { ...course, inscriptionCount }
 }
 
 export async function addCourse(data: RequiredEntityData<Course>) {
@@ -40,4 +48,11 @@ export async function removeCourse(id: number) {
     const course = em.getReference(Course, id)
     em.remove(course)
     await em.flush()
+}
+
+
+export async function validateQuota(c: Course): Promise<void> {
+  const inscriptionsCount = await c.inscriptions.loadCount()
+  if (inscriptionsCount >= c.quota) {
+    throw new QuotaExceededError(`El curso "${c.course_no}" no tiene cupo disponible`) }
 }

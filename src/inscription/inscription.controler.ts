@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import { getEm, orm } from '../shared/db/orm.js'
 import * as inscriptionService from './inscription.services.js'
 import { ScheduleConflictError, DuplicateInscriptionError} from './inscription.services.js'
+import { QuotaExceededError } from '../course/course.services.js'
 
 
 const em = orm.em
@@ -60,7 +61,7 @@ async function findOne(req: Request, res: Response) {
     }
 }*/
 
-
+//validar la quota
 async function add(req: Request, res: Response) {
     try {
         const inscription = await inscriptionService.addInscription(req.body.sanitizedInput)
@@ -70,6 +71,9 @@ async function add(req: Request, res: Response) {
             return res.status(409).send({ message: error.message })
         }
         if (error instanceof ScheduleConflictError) {
+            return res.status(409).send({ message: error.message })
+        }
+        if (error instanceof QuotaExceededError) {
             return res.status(409).send({ message: error.message })
         }
         res.status(500).send({ message: error.message })

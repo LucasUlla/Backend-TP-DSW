@@ -3,6 +3,7 @@ import { Inscription } from './inscription.entity.js'
 import { RequiredEntityData, EntityData } from '@mikro-orm/core'
 import { Course } from '../course/course.entity.js'
 import { UniqueConstraintViolationException } from '@mikro-orm/core'
+import { validateQuota } from '../course/course.services.js'
 
 export async function getAllInscriptions(courseId?: number, clientId?: number) {
     const em = getEm()
@@ -23,13 +24,6 @@ export async function removeInscription(courseId: number, clientId: number) {
     em.remove(inscription)
     await em.flush()
 }
-
-/*export async function addInscription(data: RequiredEntityData<Inscription>) {
-    const em = getEm()
-    const inscription = em.create(Inscription, data)
-    await em.flush()
-    return inscription
-}*/
 
 
 // Errores y Validacion de la Inscripcion
@@ -76,6 +70,7 @@ export async function addInscription(data: RequiredEntityData<Inscription>) {
     const em = getEm()
 
     const course = await em.findOneOrFail(Course, { id: data.course as unknown as number })
+    await validateQuota(course) 
     await validateNoScheduleConflict(data.client as unknown as number, course)
 
     try {
